@@ -1,7 +1,19 @@
 # Changelog
 
 
-## 2021/05/05 - v2.4.0: enhancement release
+## 2021/05/19 - v2.5.0: enhancement release
+
+1. Add 'inclusive' option to map URI.
+
+2. Add support for passing of file lists as inputs that are treated as directory map URI contents.
+
+
+## 2021/05/14 - v2.4.1: bug fix release
+
+1. Fix bug: add no_output_hash option back to CLI.
+
+
+## 2021/04/30 - v2.4.0: enhancement release
 
 1. Add domain to username impersonation in Agave.
 
@@ -53,8 +65,6 @@
 1. Fix bug: remove DirChooser widget from --work argument for Gooey.
 
 2. Update documentation and tutorials to reflect all v2.0 changes.
-
-2. Update documentation and tutorials to reflect all v2.0 changes
 
 
 ## 2020/08/19 - v2.0.0-beta.2: bug fix release
