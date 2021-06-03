@@ -26,9 +26,9 @@ class PostInstallCommand(install):
         install.run(self)
 
 setup(
-    name='geneflow',
+    name='geneflow3',
     version=VERSION,
-    description="A light-weight platform-agnostic workflow engine for scientific computing.",
+    description="A light-weight, extendable workflow engine for scientific computing.",
     long_description=README,
     classifiers=[
         # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -44,10 +44,10 @@ setup(
         'Programming Language :: Python :: 3 :: Only',
         'Topic :: Scientific/Engineering :: Bio-Informatics'
     ],
-    keywords='workflow agave bioinformatics',
-    author='GeneFlow Development Team',
-    author_email='oamdsupport@cdc.gov',
-    url='https://github.com/CDCgov/geneflow2',
+    keywords='workflow bioinformatics',
+    author='John Phan',
+    author_email='jhphan@gmail.com',
+    url='https://github.com/jhphan/geneflow',
     license='Apache 2.0',
     packages=find_packages('src', exclude=["*.test"]),
     package_dir={'': 'src'},
