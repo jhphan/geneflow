@@ -3,7 +3,7 @@
 GeneFlow Documentation
 ======================
 
-Version: 2.6.0
+Version: 3.0.0-alpha.1
 
 GeneFlow (GF) is a light-weight platform-agnostic workflow engine for scientific computing.
 

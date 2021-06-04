@@ -43,31 +43,8 @@ If you need to install GeneFlow, it is recommended to use a Python3 virtual envi
 
 ## Additional Documentation
 
-Additional documentation can be found [here](https://geneflow.gitlab.io/). Alternatively, it can be found in the docs folder of this source repository (or by following this link: [Additional Documentation](docs/index.rst)). You can view the index.rst text file, or you can generate the html and pdf documentation with the following commands:
+Additional documentation can be found [here](https://geneflow.gitlab.io/). Alternatively, it can be found in the docs folder of this source repository (or by following this link: [Additional Documentation](docs/index.rst)). 
 
-```
-cd ~/geneflow_work
-git clone https://github.com/CDCgov/geneflow2
-cd geneflow/docs
-make html
-make latexpdf
-```
-
-The output html and pdf files should appear in the `_build/html` or `_build/latex` folders. Note that you may need to install some dependencies prior to building the documentation. For example, for Ubuntu systems, run:
-
-```
-pip install sphinx
-sudo apt install latexmk texlive texlive-science texlive-formats-extra
-```
-
-Note that sphinx may be installed within a Python virtual environment.
-
-## Development Team and Support
-
-GeneFlow was developed by the GDIT Scientific Computing and Bioinformatics Support (SCBS) team for the Office of Advanced Molecular Detection (OAMD) at the CDC.
-
-For technical support, please contact jhphan@gmail.com.
-  
 ## License
 
 The repository utilizes code licensed under the terms of the Apache Software
