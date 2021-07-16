@@ -8,10 +8,10 @@ import yaml
 
 from geneflow.log import Log
 
-GF_VERSION = 'v2.0'
+GF_VERSION = 'v3.0'
 
 WORKFLOW_SCHEMA = {
-    'v2.0': {
+    'v3.0': {
         'gfVersion': {
             'type': 'string', 'default': GF_VERSION, 'allowed': [GF_VERSION]
         },
@@ -23,10 +23,7 @@ WORKFLOW_SCHEMA = {
         'description': {'type': 'string', 'required': True},
         'git': {'type': 'string', 'default': ''},
         'version': {'type': 'string', 'required': True},
-        'public': {'type': 'boolean', 'default': False},
-        'enable': {'type': 'boolean', 'default': True},
-        'test': {'type': 'boolean', 'default': False},
-        'username': {'type': 'string', 'default': 'user'},
+        'author': {'type': 'string', 'default': 'user'},
         'inputs': {
             'type': 'dict',
             'default': {},
@@ -36,20 +33,12 @@ WORKFLOW_SCHEMA = {
                 'schema': {
                     'label': {'type': 'string', 'required': True},
                     'description': {'type': 'string', 'default': ''},
-                    'type': {
-                        'type': 'string',
-                        'required': True,
-                        'default': 'Any',
-                        'allowed': ['File', 'Directory', 'Any']
-                    },
                     'default': {
                         'anyof': [
                             {'type': 'string'},
                             {'type': 'list', 'valueschema': {'type': 'string'}}
                         ]
                     },
-                    'enable': {'type': 'boolean', 'default': True},
-                    'visible': {'type': 'boolean', 'default': True},
                     'value': {
                         'anyof': [
                             {'type': 'string'},
@@ -68,18 +57,7 @@ WORKFLOW_SCHEMA = {
                 'schema': {
                     'label': {'type': 'string', 'required': True},
                     'description': {'type': 'string', 'default': ''},
-                    'type': {
-                        'type': 'string',
-                        'required': True,
-                        'default': 'Any',
-                        'allowed': [
-                            'File', 'Directory', 'string', 'int',
-                            'float', 'double', 'long', 'Any'
-                        ]
-                    },
                     'default': {'nullable': True, 'default': None},
-                    'enable': {'type': 'boolean', 'default': True},
-                    'visible': {'type': 'boolean', 'default': True},
                     'value': {'nullable': True, 'default': None}
                 }
             }
@@ -146,7 +124,7 @@ WORKFLOW_SCHEMA = {
                             'context': {
                                 'type': 'string',
                                 'default': 'local',
-                                'allowed': ['local', 'agave', 'tapis', 'gridengine', 'slurm']
+                                'allowed': ['local', 'gridengine', 'slurm']
                             },
                             'method': {
                                 'type': 'string',
@@ -166,7 +144,7 @@ WORKFLOW_SCHEMA = {
 }
 
 APP_SCHEMA = {
-    'v2.0': {
+    'v3.0': {
         'gfVersion': {
             'type': 'string',
             'default': GF_VERSION,
@@ -182,8 +160,7 @@ APP_SCHEMA = {
         'description': {'type': 'string', 'maxlength': 64, 'required': True},
         'git': {'type': 'string', 'default': ''},
         'version': {'type': 'string', 'required': True},
-        'public': {'type': 'boolean', 'default': True},
-        'username': {'type': 'string', 'default': 'user'},
+        'author': {'type': 'string', 'default': 'user'},
         'inputs': {
             'type': 'dict',
             'default': {},
@@ -193,12 +170,6 @@ APP_SCHEMA = {
                 'schema': {
                     'label': {'type': 'string', 'required': True},
                     'description': {'type': 'string', 'default': ''},
-                    'type': {
-                        'type': 'string',
-                        'required': True,
-                        'default': 'Any',
-                        'allowed': ['File', 'Directory', 'Any']
-                    },
                     'default': {'type': 'string', 'default': ''},
                     'value': {'type': 'string', 'default': ''},
                     'script_default': {'type': 'string', 'nullable': True},
@@ -221,15 +192,6 @@ APP_SCHEMA = {
                 'schema': {
                     'label': {'type': 'string', 'required': True},
                     'description': {'type': 'string', 'default': ''},
-                    'type': {
-                        'type': 'string',
-                        'required': True,
-                        'default': 'Any',
-                        'allowed': [
-                            'File', 'Directory', 'string', 'int',
-                            'float', 'double', 'long', 'Any'
-                        ]
-                    },
                     'default': {'nullable': True, 'default': None},
                     'value': {'nullable': True, 'default': None},
                     'required': {'type': 'boolean', 'default': False},
@@ -254,7 +216,7 @@ APP_SCHEMA = {
 }
 
 JOB_SCHEMA = {
-    'v2.0': {
+    'v3.0': {
         'gfVersion': {
             'type': 'string',
             'default': GF_VERSION,
