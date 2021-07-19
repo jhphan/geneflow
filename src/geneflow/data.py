@@ -38,14 +38,11 @@ class WorkflowEntity(Base):
     description = Column(String, default='')
     git = Column(String, default='')
     version = Column(String, default='')
-    username = Column(String, default='')
+    author = Column(String, default='')
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
     final_output = Column(Text, default='')
     apps = Column(Text, default='')
-    public = Column(Boolean, default=False)
-    enable = Column(Boolean, default=True)
-    test = Column(Boolean, default=False)
     created = Column(DateTime, default=datetime.datetime.now)
     modified = Column(DateTime, default=datetime.datetime.now)
 
@@ -60,14 +57,13 @@ class AppEntity(Base):
     description = Column(String, default='')
     git = Column(String, default='')
     version = Column(String, default='')
-    username = Column(String, default='')
+    author = Column(String, default='')
     implementation = Column(Text, default='')
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
     pre_exec = Column(Text, default='')
     exec_methods = Column(Text, default='')
     post_exec = Column(Text, default='')
-    public = Column(Boolean, default=False)
 
 
 class StepDependencyEntity(Base):
@@ -439,16 +435,13 @@ class DataSource:
                 WorkflowEntity.id,
                 WorkflowEntity.name,
                 WorkflowEntity.description,
-                WorkflowEntity.username,
+                WorkflowEntity.author,
                 WorkflowEntity.git,
                 WorkflowEntity.version,
                 WorkflowEntity.inputs,
                 WorkflowEntity.parameters,
                 WorkflowEntity.final_output,
-                WorkflowEntity.apps,
-                WorkflowEntity.public,
-                WorkflowEntity.enable,
-                WorkflowEntity.test
+                WorkflowEntity.apps
             ).\
                 filter(WorkflowEntity.id == workflow_id).\
                 all()
@@ -458,16 +451,13 @@ class DataSource:
                     'workflow_id': row[0],
                     'name': row[1],
                     'description': row[2],
-                    'username': row[3],
+                    'author': row[3],
                     'git': row[4],
                     'version': row[5],
                     'inputs': json.loads(row[6]),
                     'parameters': json.loads(row[7]),
                     'final_output': json.loads(row[8]),
                     'apps': json.loads(row[9]),
-                    'public': row[10],
-                    'enable': row[11],
-                    'test': row[12],
                     'steps': {}
                 } for row in result
             ]
@@ -515,8 +505,7 @@ class DataSource:
                 AppEntity.description,
                 AppEntity.git,
                 AppEntity.version,
-                AppEntity.public,
-                AppEntity.username,
+                AppEntity.author,
                 AppEntity.inputs,
                 AppEntity.parameters,
                 AppEntity.implementation,
@@ -535,14 +524,13 @@ class DataSource:
                     'description': row[2],
                     'git': row[3],
                     'version': row[4],
-                    'public': row[5],
-                    'username': row[6],
-                    'inputs': json.loads(row[7]),
-                    'parameters': json.loads(row[8]),
-                    'implementation': json.loads(row[9]),
-                    'pre_exec': json.loads(row[10]),
-                    'exec_methods': json.loads(row[11]),
-                    'post_exec': json.loads(row[12])
+                    'author': row[5],
+                    'inputs': json.loads(row[6]),
+                    'parameters': json.loads(row[7]),
+                    'implementation': json.loads(row[8]),
+                    'pre_exec': json.loads(row[9]),
+                    'exec_methods': json.loads(row[10]),
+                    'post_exec': json.loads(row[11])
                 } for row in result
             }
 
@@ -641,16 +629,13 @@ class DataSource:
                 id=workflow_id,
                 name=data['name'],
                 description=data['description'],
-                username=data['username'],
+                author=data['author'],
                 git=data['git'],
                 version=data['version'],
                 inputs=data['inputs'],
                 parameters=data['parameters'],
                 final_output=data['final_output'],
                 apps=data['apps'],
-                public=data['public'],
-                enable=data['enable'],
-                test=data['test'],
                 created=None,
                 modified=None
             ))
@@ -847,15 +832,13 @@ class DataSource:
                 description=data['description'],
                 git=data['git'],
                 version=data['version'],
-                username=data['username'],
-                public=data['public'],
+                author=data['author'],
                 implementation=data['implementation'],
                 inputs=data['inputs'],
                 parameters=data['parameters'],
                 pre_exec=data['pre_exec'],
                 exec_methods=data['exec_methods'],
                 post_exec=data['post_exec']
-
             ))
         except SQLAlchemyError as err:
             Log.an().error('sql exception [%s]', str(err))
@@ -1690,8 +1673,7 @@ class DataSource:
                 'description': valid_def['description'],
                 'git': valid_def['git'],
                 'version': valid_def['version'],
-                'username': valid_def['username'],
-                'public': valid_def['public'],
+                'author': valid_def['author'],
                 'implementation': json.dumps(valid_def['implementation']),
                 'inputs': json.dumps(valid_def['inputs']),
                 'parameters': json.dumps(valid_def['parameters']),
@@ -1807,8 +1789,7 @@ class DataSource:
                     'description': valid_def['description'],
                     'git': valid_def['git'],
                     'version': valid_def['version'],
-                    'username': valid_def['username'],
-                    'public': valid_def['public'],
+                    'author': valid_def['author'],
                     'implementation': json.dumps(valid_def['implementation']),
                     'inputs': json.dumps(valid_def['inputs']),
                     'parameters': json.dumps(valid_def['parameters']),
@@ -2179,15 +2160,12 @@ class DataSource:
             workflow_id = self.add_workflow({
                 'name': valid_def['name'],
                 'description': valid_def['description'],
-                'username': valid_def['username'],
+                'author': valid_def['author'],
                 'inputs': json.dumps(valid_def['inputs']),
                 'apps': json.dumps(valid_def['apps']),
                 'git': valid_def['git'],
                 'parameters': json.dumps(valid_def['parameters']),
                 'final_output': json.dumps(valid_def['final_output']),
-                'public': valid_def['public'],
-                'enable': valid_def['enable'],
-                'test': valid_def['test'],
                 'version': valid_def['version']
             })
             if not workflow_id:
@@ -2335,15 +2313,12 @@ class DataSource:
                 {
                     'name': valid_def['name'],
                     'description': valid_def['description'],
-                    'username': valid_def['username'],
+                    'author': valid_def['author'],
                     'git': valid_def['git'],
                     'inputs': json.dumps(valid_def['inputs']),
                     'parameters': json.dumps(valid_def['parameters']),
                     'final_output': json.dumps(valid_def['final_output']),
                     'apps': json.dumps(valid_def['apps']),
-                    'public': valid_def['public'],
-                    'enable': valid_def['enable'],
-                    'test': valid_def['test'],
                     'version': valid_def['version']
                 }
         ):
