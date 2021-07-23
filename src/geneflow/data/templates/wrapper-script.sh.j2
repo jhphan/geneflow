@@ -433,26 +433,14 @@ if [ -z "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
 fi
 # make sure {{ key|upper }} is staged
 count=0
-{% if value.type == 'File' %}
-while [ ! -f "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-{% elif value.type == 'Directory' %}
-while [ ! -d "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-{% else %}
 while [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-{% endif %}
 do
     echo "${{ '{' }}{{ key|upper }}{{ '}' }} not staged, waiting..."
     sleep 1
     count=$((count+1))
     if [ $count == 10 ]; then break; fi
 done
-{% if value.type == 'File' %}
-if [ ! -f "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-{% elif value.type == 'Directory' %}
-if [ ! -d "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-{% else %}
 if [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-{% endif %}
     echo "{{ value.label }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
     exit 1
 fi
@@ -467,26 +455,14 @@ fi
 if [ -n "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
     # make sure ${{ '{' }}{{ key|upper }}{{ '}' }} is staged
     count=0
-    {% if value.type == 'File' %}
-    while [ ! -f "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-    {% elif value.type == 'Directory' %}
-    while [ ! -d "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-    {% else %}
     while [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-    {% endif %}
     do
         echo "${{ '{' }}{{ key|upper }}{{ '}' }} not staged, waiting..."
         sleep 1
         count=$((count+1))
         if [ $count == 10 ]; then break; fi
     done
-    {% if value.type == 'File' %}
-    if [ ! -f "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    {% elif value.type == 'Directory' %}
-    if [ ! -d "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    {% else %}
     if [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    {% endif %}
         echo "{{ value.label }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
         exit 1
     fi
@@ -507,14 +483,12 @@ fi
 # {{ key|upper }} parameter
 if [ -n "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
     :
-    {% if value.type == 'File' or value.type == 'Directory' or value.type == 'Any' %}
+    {% if key == 'output' %}
     {{ key|upper }}_FULL=$(readlink -f "${{ '{' }}{{ key|upper }}{{ '}' }}")
     {{ key|upper }}_DIR=$(dirname "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
     {{ key|upper }}_BASE=$(basename "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
-    {% if key == 'output' %}
     LOG_FULL="${OUTPUT_DIR}/_log"
     TMP_FULL="${OUTPUT_DIR}/_tmp"
-    {% endif %}
     {% endif %}
     {% for exec_item in value.post_exec %}
     {{ exec(exec_item) }}
