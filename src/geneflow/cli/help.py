@@ -119,8 +119,7 @@ def help_func(args, other_args, subparser=None):
             )
         )
         print(
-            '\t\ttype: {}, default: {}'.format(
-                workflow_dict['inputs'][input_key]['type'],
+            '\t\tdefault: {}'.format(
                 workflow_dict['inputs'][input_key]['default']
             )
         )
@@ -135,8 +134,7 @@ def help_func(args, other_args, subparser=None):
             )
         )
         print(
-            '\t\ttype: {}, default: {}'.format(
-                workflow_dict['parameters'][param_key]['type'],
+            '\t\tdefault: {}'.format(
                 workflow_dict['parameters'][param_key]['default']
             )
         )
