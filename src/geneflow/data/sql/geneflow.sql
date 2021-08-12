@@ -84,7 +84,6 @@ create table job (
     exec_context text not null default '',
     exec_method text not null default '',
     exec_parameters text not null default '',
-    notifications text not null default '[]',
     primary key (id)
 );
 

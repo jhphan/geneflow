@@ -12,7 +12,7 @@ class DataManager:
     """
     Copy/move, list, delete data for various contexts.
 
-    Currently, these contexts include: local, agave.
+    Currently, these contexts include: local.
     """
 
     @classmethod

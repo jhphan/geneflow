@@ -140,7 +140,7 @@ def help_func(args, other_args, subparser=None):
         )
     print()
     print('Execution Configuration:')
-    print('\t--ec,--exec-context: Execution contexts, e.g., local, agave, gridengine.')
+    print('\t--ec,--exec-context: Execution contexts, e.g., local, gridengine, slurm.')
     print('\t\tThese can be specified for all workflow steps with "default:[CONTEXT]"')
     print('\t\tor for specific steps with "step-name:[CONTEXT]".')
     print('\t--em,--exec-method: Exeuction methods, e.g., singularity, docker, environment.')

@@ -6,10 +6,6 @@ from pathlib import Path
 import pprint
 import yaml
 
-try:
-    from agavepy.agave import Agave
-except ImportError: pass
-
 from git import Repo
 from git.exc import GitError
 import requests
@@ -21,7 +17,6 @@ from geneflow.definition import Definition
 from geneflow.log import Log
 from geneflow.template_compiler import TemplateCompiler
 from geneflow.uri_parser import URIParser
-from geneflow.extend.agave_wrapper import AgaveWrapper
 
 
 requests.packages.urllib3.disable_warnings(
@@ -46,10 +41,6 @@ class WorkflowInstaller:
             app_name=None,
             clean=False,
             config=None,
-            agave_params=None,
-            agave_username=None,
-            agave_domain=None,
-            agave_publish=False,
             make_apps=True
     ):
         """
@@ -63,11 +54,7 @@ class WorkflowInstaller:
             force: delete existing folder before install?
             app_name: name of app to install
             clean: delete apps folder before install?
-            config: GeneFlow config dict that contains Agave client if needed
-            agave_params: dict that contains agave parameters for
-                app registration
-            agave_username: agave username to impersonate when installing apps
-            agave_publish: publish agave app?
+            config: GeneFlow config dict
             make_apps: compile app templates
 
         Returns:
@@ -84,13 +71,7 @@ class WorkflowInstaller:
 
         self._workflow_yaml = None
 
-        # agave-related member variables
-        self._agave_wrapper = None
         self._config = config
-        self._agave_params = agave_params
-        self._agave_username = agave_username
-        self._agave_domain = agave_domain
-        self._agave_publish = agave_publish
 
 
     def initialize(self):
@@ -98,7 +79,7 @@ class WorkflowInstaller:
         Initialize the GeneFlow WorkflowInstaller class.
 
         Initialize the class by cloning the workflow, validating the
-        structure, loading apps config, and connecting to agave.
+        structure, loading apps config.
 
         Args:
             self: class instance
@@ -123,16 +104,6 @@ class WorkflowInstaller:
         if not self._load_workflow_def():
             Log.an().error('cannot load workflow definition from %s', self._workflow_yaml)
             return False
-
-        # connect to agave
-        if self._config and self._agave_params:
-            if self._config.get('agave') and self._agave_params.get('agave'):
-                self._config['agave']['token_username'] = self._agave_username
-                self._config['agave']['domain'] = self._agave_domain
-                self._agave_wrapper = AgaveWrapper(self._config['agave'])
-                if not self._agave_wrapper.connect():
-                    Log.an().error('cannot connect to agave')
-                    return False
 
         return True
 
@@ -280,123 +251,12 @@ class WorkflowInstaller:
                         Log.an().error('cannot compile app templates')
                         return False
 
-
-                # register in Agave
-                if (
-                        self._agave_wrapper
-                        and self._agave_params
-                        and self._agave_params.get('agave')
-                ):
-                    register_result = app_installer.register_agave_app(
-                        self._agave_wrapper,
-                        self._agave_params,
-                        self._agave_publish
+                # update app definition with implementation section
+                if not app_installer.update_def():
+                    Log.an().error(
+                        'cannot update app "%s" definition',
+                        app
                     )
-                    if not register_result:
-                        Log.an().error(
-                            'cannot register app "%s" in agave', app
-                        )
-                        return False
-
-                    Log.some().info(
-                        'registered agave app:\n%s',
-                        pprint.pformat(register_result)
-                    )
-
-                    # update app definition with implementation section
-                    if not app_installer.update_def(
-                        agave={
-                            'apps_prefix': self._agave_params['agave']['appsPrefix'],
-                            'revision': register_result['revision']
-                        }
-                    ):
-                        Log.an().error(
-                            'cannot update app "%s" definition',
-                            app
-                        )
-                        return False
-
-                else:
-                    # update app definition with implementation section
-                    if not app_installer.update_def(agave=None):
-                        Log.an().error(
-                            'cannot update app "%s" definition',
-                            app
-                        )
-                        return False
-
-        return True
-
-
-    def upload_agave_test_data(self):
-        """
-        Upload Agave test data from workflow package.
-
-        Args:
-            self: class instance.
-
-        Returns:
-            None
-
-        """
-        if (
-                not self._agave_wrapper
-                or not self._agave_params
-                or not self._agave_params.get('agave')
-        ):
-            Log.a().warning('must provide agave parameters to upload test data')
-            return False
-
-        # create main test data URI
-        parsed_base_test_uri = URIParser.parse(
-            'agave://{}/{}'.format(
-                self._agave_params['agave']['deploymentSystem'],
-                self._agave_params['agave']['testDataDir']
-            )
-        )
-        Log.some().info(
-            'creating base test data uri: %s',
-            parsed_base_test_uri['chopped_uri']
-        )
-        if not DataManager.mkdir(
-                parsed_uri=parsed_base_test_uri,
-                recursive=True,
-                agave={
-                    'agave_wrapper': self._agave_wrapper
-                }
-        ):
-            Log.a().warning(
-                'cannot create base test data uri: %s',
-                parsed_base_test_uri['chopped_uri']
-            )
-            return False
-
-        # upload test data
-        parsed_local_test_uri = URIParser.parse(str(Path(self._path) / 'data'))
-        parsed_agave_test_uri = URIParser.parse(
-            '{}/{}'.format(
-                parsed_base_test_uri['chopped_uri'],
-                Path(self._path).name
-            )
-        )
-        Log.some().info(
-            'copying test data from %s to %s',
-            parsed_local_test_uri['chopped_uri'],
-            parsed_agave_test_uri['chopped_uri']
-        )
-        if not DataManager.copy(
-                parsed_src_uri=parsed_local_test_uri,
-                parsed_dest_uri=parsed_agave_test_uri,
-                local={},
-                agave={
-                    'agave_wrapper': self._agave_wrapper
-                }
-        ):
-            Log.a().warning(
-                'cannot copy test data from %s to %s',
-                parsed_local_test_uri['chopped_uri'],
-                parsed_agave_test_uri['chopped_uri']
-            )
-            return False
+                    return False
 
         return True

@@ -196,7 +196,7 @@ class WorkflowStep(StageableData):
         Create the output data URI for the step.
 
         This method must be overridden by a child class
-        for a specific context (i.e., local, agave).
+        for a specific context (i.e., local).
 
         """
         raise NotImplementedError

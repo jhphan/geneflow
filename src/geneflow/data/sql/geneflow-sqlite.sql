@@ -92,7 +92,6 @@ CREATE TABLE job (
     exec_context TEXT NOT NULL DEFAULT '',
     exec_method TEXT NOT NULL DEFAULT '',
     exec_parameters TEXT NOT NULL DEFAULT '',
-    notifications TEXT NOT NULL DEFAULT '[]',
     PRIMARY KEY (id)
 );
 

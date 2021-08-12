@@ -119,7 +119,6 @@ class JobEntity(Base):
     exec_context = Column(Text, default='')
     exec_method = Column(Text, default='')
     exec_parameters = Column(Text, default='')
-    notifications = Column(Text, default='[]')
 
 
 class JobStepEntity(Base):
@@ -273,8 +272,7 @@ class DataSource:
                 JobEntity.final_output,
                 JobEntity.exec_context,
                 JobEntity.exec_method,
-                JobEntity.exec_parameters,
-                JobEntity.notifications
+                JobEntity.exec_parameters
             ).\
                 filter(JobEntity.id == job_id).\
                 filter(WorkflowEntity.id == JobEntity.workflow_id).\
@@ -297,8 +295,7 @@ class DataSource:
                         'context': json.loads(row[11]),
                         'method': json.loads(row[12]),
                         'parameters': json.loads(row[13])
-                    },
-                    'notifications': json.loads(row[14])
+                    }
                 } for row in result
             ]
 
@@ -1296,8 +1293,7 @@ class DataSource:
                 final_output=data['final_output'],
                 exec_context=data['exec_context'],
                 exec_method=data['exec_method'],
-                exec_parameters=data['exec_parameters'],
-                notifications=data['notifications']
+                exec_parameters=data['exec_parameters']
             ))
         except SQLAlchemyError as err:
             Log.an().error('sql exception [%s]', str(err))
@@ -2474,8 +2470,7 @@ class DataSource:
                 'final_output': json.dumps(valid_def['final_output']),
                 'exec_context': json.dumps(valid_def['execution']['context']),
                 'exec_method': json.dumps(valid_def['execution']['method']),
-                'exec_parameters': json.dumps(valid_def['execution']['parameters']),
-                'notifications': json.dumps(valid_def['notifications'])
+                'exec_parameters': json.dumps(valid_def['execution']['parameters'])
             })
             if not job_id:
                 Log.an().error(

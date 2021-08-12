@@ -282,8 +282,6 @@ JOB_SCHEMA = {
                         'default': 'local',
                         'allowed': [
                             'local',
-                            'agave',
-                            'tapis',
                             'gridengine',
                             'slurm'
                         ]
@@ -320,24 +318,6 @@ JOB_SCHEMA = {
                         'default': {},
                         'allow_unknown': True
                     }
-                }
-            }
-        },
-        'notifications': {
-            'type': 'list',
-            'default': [],
-            'schema': {
-                'type': 'dict',
-                'default': {},
-                'schema': {
-                    'url': {'type': 'string', 'required': True},
-                    'to': {
-                        'anyof': [
-                            {'type': 'string', 'required': True},
-                            {'type': 'list', 'required': True}
-                        ],
-                    },
-                    'events': {'type': 'string', 'default': '*'}
                 }
             }
         }

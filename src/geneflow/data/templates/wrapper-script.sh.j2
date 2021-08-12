@@ -269,13 +269,9 @@ contains() {
 ## SCRIPT_DIR: directory of current script, depends on execution
 ## environment, which may be detectable using environment variables
 ###############################################################################
-if [ -z "${AGAVE_JOB_ID}" ]; then
-    # not an agave job
-    SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-else
-    echo "Agave job detected"
-    SCRIPT_DIR=$(pwd)
-fi
+
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+
 ## ****************************************************************************
 
 

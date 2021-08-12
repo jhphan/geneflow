@@ -1,6 +1,17 @@
 # Changelog
 
 
+## 2021/08/13 - v3.0.0-alpha.1: major enhancement/simplification release
+
+1. Remove Gooey (GUI) support.
+
+2. Simplify app and workflow schema by removing input and parameter types.
+
+3. Remove Agave/Tapis support. 
+
+4. Remove "notifications" section from job definition.
+
+
 ## 2021/06/01 - v2.6.0: enhancement release
 
 1. Add support for throttling number of simultaneous jobs.

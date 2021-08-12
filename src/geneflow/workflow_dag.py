@@ -47,7 +47,7 @@ class WorkflowDAG:
             parsed_job_output_uri: job output URI.
             config: dict of workflow config
             **kwargs: additional arguments specific to contexts for this
-                workflow (e.g., local or agave arguments)
+                workflow (e.g., local arguments)
 
         Returns:
             WorkflowDAG instance.
@@ -436,7 +436,7 @@ class WorkflowDAG:
         Create empty nodes for each workflow input and step.
 
         Nodes contain attributes for type (e.g., input or step), contexts for
-        data staging (e.g., local or agave), source context, and node.
+        data staging (e.g., local), source context, and node.
         The node attribute is initialized as None, but will later be a
         reference to a WorkflowInput or WorkflowStep object.
 

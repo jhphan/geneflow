@@ -28,12 +28,6 @@ ENV_SCHEMA = {
                 'type': 'sqlite',
                 'path': 'database.db'
             }
-        },
-        'agave': {
-            'type': 'dict',
-            'default': {
-                'connection_type': 'agave-cli'
-            }
         }
     }
 }
@@ -54,70 +48,13 @@ DATABASE_SCHEMA = {
     }
 }
 
-AGAVE_SCHEMA = {
-    GF_VERSION: {
-        'impersonate': {
-            'connection_type': {
-                'type': 'string',
-                'required': True,
-                'allowed': ['impersonate']
-            },
-            'client': {'type': 'string', 'required': True},
-            'key': {'type': 'string', 'required': True},
-            'secret': {'type': 'string', 'required': True},
-            'server': {'type': 'string', 'required': True},
-            'username': {'type': 'string', 'required': True},
-            'password': {'type': 'string', 'required': True},
-            'token_username': {'type': 'string'},
-            'domain': {'type': 'string'},
-            'retry': {'type': 'integer', 'default': 5},
-            'retry_delay': {'type': 'integer', 'default': 3},
-            'token_retry': {'type': 'integer', 'default': 3},
-            'token_retry_delay': {'type': 'integer', 'default': 1},
-            'mkdir_retry': {'type': 'integer', 'default': 3},
-            'mkdir_retry_delay': {'type': 'integer', 'default': 5},
-            'import_retry': {'type': 'integer', 'default': 3},
-            'import_retry_delay': {'type': 'integer', 'default': 5},
-            'job_submit_retry': {'type': 'integer', 'default': 5},
-            'job_submit_retry_delay': {'type': 'integer', 'default': 5},
-            'job_retry': {'type': 'integer', 'default': 3},
-            'files_list_retry': {'type': 'integer', 'default': 5},
-            'files_list_retry_delay': {'type': 'integer', 'default': 5},
-            'files_delete_retry': {'type': 'integer', 'default': 3},
-            'files_delete_retry_delay': {'type': 'integer', 'default': 1}
-        },
-        'agave-cli': {
-            'connection_type': {
-                'type': 'string',
-                'required': True,
-                'allowed': ['agave-cli']
-            },
-            'retry': {'type': 'integer', 'default': 5},
-            'retry_delay': {'type': 'integer', 'default': 3},
-            'token_retry': {'type': 'integer', 'default': 3},
-            'token_retry_delay': {'type': 'integer', 'default': 1},
-            'mkdir_retry': {'type': 'integer', 'default': 3},
-            'mkdir_retry_delay': {'type': 'integer', 'default': 5},
-            'import_retry': {'type': 'integer', 'default': 3},
-            'import_retry_delay': {'type': 'integer', 'default': 5},
-            'job_submit_retry': {'type': 'integer', 'default': 5},
-            'job_submit_retry_delay': {'type': 'integer', 'default': 5},
-            'job_retry': {'type': 'integer', 'default': 3},
-            'files_list_retry': {'type': 'integer', 'default': 5},
-            'files_list_retry_delay': {'type': 'integer', 'default': 5},
-            'files_delete_retry': {'type': 'integer', 'default': 3},
-            'files_delete_retry_delay': {'type': 'integer', 'default': 1}
-        }
-    }
-}
-
 
 class Config:
     """
     GeneFlow Config class.
 
-    Config stores information about the database, Agave connection, and
-    end-point access. It also validates config definitions.
+    Config stores information about the database.
+    It also validates config definitions.
 
     """
 
@@ -247,33 +184,6 @@ class Config:
                     return False
 
                 valid_def[env]['database'] = valid_db_def
-
-                # validate agave section
-                if valid_def[env]['agave']['connection_type']\
-                        not in ['impersonate', 'agave-cli']:
-                    Log.an().error(
-                        'invalid agave connection type "%s" in environment "%s"',
-                        valid_def[env]['agave']['connection_type'],
-                        env
-                    )
-                    return False
-
-                valid_agave_def = validator.validated(
-                    valid_def[env]['agave'],
-                    AGAVE_SCHEMA[GF_VERSION][
-                        valid_def[env]['agave']['connection_type']
-                    ]
-                )
-
-                if not valid_agave_def:
-                    Log.an().error(
-                        'config agave validation error: env=%s\n%s',
-                        env,
-                        pprint.pformat(validator.errors)
-                    )
-                    return False
-
-                valid_def[env]['agave'] = valid_agave_def
 
         return valid_def
 

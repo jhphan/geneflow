@@ -27,12 +27,6 @@ def init_subparser(subparsers):
         type=str,
         help='GeneFlow workflow definition or package directory'
     )
-    parser.add_argument(
-        '-g','--gui',
-        action='store_true',
-        default=False,
-        help='Use a GUI argument parser'
-    )
     parser.set_defaults(func=run)
 
     return parser

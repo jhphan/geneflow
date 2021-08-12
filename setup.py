@@ -53,14 +53,12 @@ setup(
     package_dir={'': 'src'},
     package_data={'': ['data/sql/geneflow.sql',
                        'data/sql/geneflow-sqlite.sql',
-                       'data/templates/agave-app-def.json.j2.j2',
                        'data/templates/wrapper-script.sh.j2',
                        'data/templates/test.sh.j2']},
     include_package_data=True,
     zip_safe=False,
     install_requires=INSTALL_REQUIRES,
     extras_require={
-        'tapis': ['agavepy==1.0.0a11'],
         'hpc': ['drmaa']
     },
     python_requires=PYTHON_REQUIRES,

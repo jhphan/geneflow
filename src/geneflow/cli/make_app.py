@@ -34,7 +34,7 @@ def init_subparser(subparsers):
         default='all',
         help=(
             'App file to make '
-            '(agave, wrapper, test, all [default])'
+            '(wrapper, test, all [default])'
         )
     )
     parser.set_defaults(func=make_app)
@@ -60,11 +60,6 @@ def make_app(args, other_args, subparser=None):
         Log.an().error('cannot load app config file')
         return False
 
-    if args.target == 'agave':
-        if not app_installer.make_agave():
-            Log.an().error('cannot make app agave definition')
-            return False
-
     elif args.target == 'wrapper':
         if not app_installer.make_wrapper():
             Log.an().error('cannot make app wrapper script')
@@ -82,7 +77,7 @@ def make_app(args, other_args, subparser=None):
 
     else:
         Log.an().error(
-            'invalid target, please specify agave, wrapper, or test'
+            'invalid target, please specify wrapper, test, or all'
         )
         return False
 
