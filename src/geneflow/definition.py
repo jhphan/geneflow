@@ -31,7 +31,6 @@ WORKFLOW_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'label': {'type': 'string', 'required': True},
                     'description': {'type': 'string', 'default': ''},
                     'default': {
                         'anyof': [
@@ -55,10 +54,9 @@ WORKFLOW_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'label': {'type': 'string', 'required': True},
                     'description': {'type': 'string', 'default': ''},
-                    'default': {'nullable': True, 'default': None},
-                    'value': {'nullable': True, 'default': None}
+                    'default': {'type': 'string', 'default': '', 'coerce': (lambda s: str(s))},
+                    'value': {'type': 'string', 'default': '', 'coerce': (lambda s: str(s))}
                 }
             }
         },
@@ -72,8 +70,8 @@ WORKFLOW_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'git': {'type': 'string', 'required': True},
-                    'version': {'type': 'string', 'nullable': True, 'default': None},
+                    'git': {'type': 'string', 'default': ''},
+                    'version': {'type': 'string', 'default': ''}
                 }
             }
         },
@@ -168,7 +166,6 @@ APP_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'label': {'type': 'string', 'default': ''},
                     'description': {'type': 'string', 'default': ''},
                     'default': {'type': 'string', 'default': ''},
                     'value': {'type': 'string', 'default': ''},
@@ -190,7 +187,6 @@ APP_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'label': {'type': 'string', 'default': ''},
                     'description': {'type': 'string', 'default': ''},
                     'default': {'type': 'string', 'default': ''},
                     'value': {'type': 'string', 'default': ''},

@@ -208,10 +208,10 @@
 usage () {
     echo "Usage: $(basename "$0")"
     {% for key, value in inputs.items() %}
-    echo "  --{{ key }} => {{ value.label }}"
+    echo "  --{{ key }} => {{ value.description }}"
     {% endfor %}
     {% for key, value in parameters.items() %}
-    echo "  --{{ key }} => {{ value.label }}"
+    echo "  --{{ key }} => {{ value.description }}"
     {% endfor %}
     echo "  --exec_method => Execution method (
         {%- for exec_method in exec_methods -%}
@@ -422,7 +422,7 @@ echo "Execution Initialization: ${EXEC_INIT}"
 {% if value.required %}
 
 if [ -z "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    echo "{{ value.label }} required"
+    echo "{{ key }} required"
     echo
     usage
     exit 1
@@ -437,7 +437,7 @@ do
     if [ $count == 10 ]; then break; fi
 done
 if [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    echo "{{ value.label }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
+    echo "{{ key }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
     exit 1
 fi
 {{ key|upper }}_FULL=$(readlink -f "${{ '{' }}{{ key|upper }}{{ '}' }}")
@@ -459,7 +459,7 @@ if [ -n "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
         if [ $count == 10 ]; then break; fi
     done
     if [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-        echo "{{ value.label }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
+        echo "{{ key }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
         exit 1
     fi
     {{ key|upper }}_FULL=$(readlink -f "${{ '{' }}{{ key|upper }}{{ '}' }}")
@@ -492,7 +492,7 @@ if [ -n "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
 else
     :
 {% if value.required %}
-    echo "{{ value.label }} required"
+    echo "{{ key }} required"
     echo
     usage
     exit 1

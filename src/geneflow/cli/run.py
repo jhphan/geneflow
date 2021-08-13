@@ -193,7 +193,7 @@ def run(args, other_args, subparser):
                 default=workflow_dict['inputs'][input_key]['default'] \
                     if isinstance(workflow_dict['inputs'][input_key]['default'], list) \
                     else [workflow_dict['inputs'][input_key]['default']],
-                help=workflow_dict['inputs'][input_key]['label']
+                help=workflow_dict['inputs'][input_key]['description']
             )
         for param_key in workflow_dict['parameters']:
             dynamic_parser.add_argument(
@@ -201,7 +201,7 @@ def run(args, other_args, subparser):
                 dest='parameters.{}'.format(param_key),
                 required=False,
                 default=workflow_dict['parameters'][param_key]['default'],
-                help=workflow_dict['parameters'][param_key]['label']
+                help=workflow_dict['parameters'][param_key]['description']
             )
         dynamic_parser.add_argument(
             '-o', '--output',

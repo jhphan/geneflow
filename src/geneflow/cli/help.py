@@ -112,9 +112,8 @@ def help_func(args, other_args, subparser=None):
     print('Inputs: Workflow-Specific Files or Folders')
     for input_key in workflow_dict['inputs']:
         print(
-            '\t--in.{}: {}: {}'.format(
+            '\t--in.{}: {}'.format(
                 input_key,
-                workflow_dict['inputs'][input_key]['label'],
                 workflow_dict['inputs'][input_key]['description']
             )
         )
@@ -127,9 +126,8 @@ def help_func(args, other_args, subparser=None):
     print('Parameters: Workflow-Specific Values')
     for param_key in workflow_dict['parameters']:
         print(
-            '\t--param.{}: {}: {}'.format(
+            '\t--param.{}: {}'.format(
                 param_key,
-                workflow_dict['parameters'][param_key]['label'],
                 workflow_dict['parameters'][param_key]['description']
             )
         )
