@@ -61,9 +61,9 @@ class AppEntity(Base):
     implementation = Column(Text, default='')
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
-    pre_exec = Column(Text, default='')
+    exec_pre = Column(Text, default='')
     exec_methods = Column(Text, default='')
-    post_exec = Column(Text, default='')
+    exec_post = Column(Text, default='')
 
 
 class StepDependencyEntity(Base):
@@ -506,9 +506,9 @@ class DataSource:
                 AppEntity.inputs,
                 AppEntity.parameters,
                 AppEntity.implementation,
-                AppEntity.pre_exec,
+                AppEntity.exec_pre,
                 AppEntity.exec_methods,
-                AppEntity.post_exec
+                AppEntity.exec_post
             ).\
                 filter(StepEntity.workflow_id == workflow_id).\
                 filter(StepEntity.app_id == AppEntity.id).\
@@ -525,9 +525,11 @@ class DataSource:
                     'inputs': json.loads(row[6]),
                     'parameters': json.loads(row[7]),
                     'implementation': json.loads(row[8]),
-                    'pre_exec': json.loads(row[9]),
-                    'exec_methods': json.loads(row[10]),
-                    'post_exec': json.loads(row[11])
+                    'execution': {
+                        'pre': json.loads(row[9]),
+                        'methods': json.loads(row[10]),
+                        'post': json.loads(row[11])
+                    }
                 } for row in result
             }
 
@@ -833,9 +835,9 @@ class DataSource:
                 implementation=data['implementation'],
                 inputs=data['inputs'],
                 parameters=data['parameters'],
-                pre_exec=data['pre_exec'],
+                exec_pre=data['exec_pre'],
                 exec_methods=data['exec_methods'],
-                post_exec=data['post_exec']
+                exec_post=data['exec_post']
             ))
         except SQLAlchemyError as err:
             Log.an().error('sql exception [%s]', str(err))
@@ -1673,9 +1675,9 @@ class DataSource:
                 'implementation': json.dumps(valid_def['implementation']),
                 'inputs': json.dumps(valid_def['inputs']),
                 'parameters': json.dumps(valid_def['parameters']),
-                'pre_exec': json.dumps(valid_def['pre_exec']),
-                'exec_methods': json.dumps(valid_def['exec_methods']),
-                'post_exec': json.dumps(valid_def['post_exec'])
+                'exec_pre': json.dumps(valid_def['execution']['pre']),
+                'exec_methods': json.dumps(valid_def['execution']['methods']),
+                'exec_post': json.dumps(valid_def['execution']['post'])
             })
             if not app_id:
                 Log.an().error(
@@ -1789,9 +1791,9 @@ class DataSource:
                     'implementation': json.dumps(valid_def['implementation']),
                     'inputs': json.dumps(valid_def['inputs']),
                     'parameters': json.dumps(valid_def['parameters']),
-                    'pre_exec': json.dumps(valid_def['pre_exec']),
-                    'exec_methods': json.dumps(valid_def['exec_methods']),
-                    'post_exec': json.dumps(valid_def['post_exec']),
+                    'exec_pre': json.dumps(valid_def['execution']['pre']),
+                    'exec_methods': json.dumps(valid_def['execution']['methods']),
+                    'exec_post': json.dumps(valid_def['execution']['post'])
                 }
         ):
             Log.an().error(

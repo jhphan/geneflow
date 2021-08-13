@@ -156,11 +156,11 @@ APP_SCHEMA = {
             'allowed': ['app']
         },
         'app_id': {'type': 'string', 'default': ''},
-        'name': {'type': 'string', 'required': True},
-        'description': {'type': 'string', 'maxlength': 64, 'required': True},
+        'name': {'type': 'string', 'default': ''},
+        'description': {'type': 'string', 'maxlength': 64, 'default': ''},
         'git': {'type': 'string', 'default': ''},
-        'version': {'type': 'string', 'required': True},
-        'author': {'type': 'string', 'default': 'user'},
+        'version': {'type': 'string', 'default': ''},
+        'author': {'type': 'string', 'default': ''},
         'inputs': {
             'type': 'dict',
             'default': {},
@@ -168,14 +168,14 @@ APP_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'label': {'type': 'string', 'required': True},
+                    'label': {'type': 'string', 'default': ''},
                     'description': {'type': 'string', 'default': ''},
                     'default': {'type': 'string', 'default': ''},
                     'value': {'type': 'string', 'default': ''},
-                    'script_default': {'type': 'string', 'nullable': True},
+                    'script_default': {'type': 'string', 'default': ''},
                     'required': {'type': 'boolean', 'default': False},
-                    'test_value': {'type': 'string', 'nullable': True},
-                    'post_exec': {
+                    'test_value': {'type': 'string', 'default': ''},
+                    'post': {
                         'type': 'list',
                         'schema': {'type': 'dict'},
                         'nullable': True
@@ -190,13 +190,13 @@ APP_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'label': {'type': 'string', 'required': True},
+                    'label': {'type': 'string', 'default': ''},
                     'description': {'type': 'string', 'default': ''},
-                    'default': {'nullable': True, 'default': None},
-                    'value': {'nullable': True, 'default': None},
+                    'default': {'type': 'string', 'default': ''},
+                    'value': {'type': 'string', 'default': ''},
                     'required': {'type': 'boolean', 'default': False},
-                    'test_value': {'nullable': True},
-                    'post_exec': {
+                    'test_value': {'type': 'string', 'default': ''},
+                    'post': {
                         'type': 'list',
                         'schema': {'type': 'dict'},
                         'nullable': True
@@ -204,9 +204,14 @@ APP_SCHEMA = {
                 }
             }
         },
-        'pre_exec': {'type': 'list', 'default': []},
-        'exec_methods': {'type': 'list', 'default': []},
-        'post_exec': {'type': 'list', 'default': []},
+        'execution': {
+            'type': 'dict',
+            'schema': {
+                'pre': {'type': 'list', 'default': []},
+                'methods': {'type': 'list', 'default': []},
+                'post': {'type': 'list', 'default': []}
+            }
+        },
         'implementation': {
             'type': 'dict',
             'required': False,

@@ -1,5 +1,3 @@
--- workflow schema 20200526-00
-
 drop table if exists workflow;
 drop table if exists app;
 drop table if exists step;
@@ -34,9 +32,9 @@ create table app (
     implementation text not null default '',
     inputs text not null default '',
     parameters text not null default '',
-    pre_exec text not null default '',
+    exec_pre text not null default '',
     exec_methods text not null default '',
-    post_exec text not null default '',
+    exec_post text not null default '',
     primary key (id)
 );
 
