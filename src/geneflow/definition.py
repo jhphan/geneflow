@@ -18,12 +18,12 @@ WORKFLOW_SCHEMA = {
         'class': {
             'type': 'string', 'default': 'workflow', 'allowed': ['workflow']
         },
-        'workflow_id': {'type': 'string', 'default': ''},
-        'name': {'type': 'string', 'required': True},
-        'description': {'type': 'string', 'required': True},
-        'git': {'type': 'string', 'default': ''},
-        'version': {'type': 'string', 'required': True},
-        'author': {'type': 'string', 'default': 'user'},
+        'workflow_id': {'type': 'string', 'default': ''}, # db artifact
+        'name': {'type': 'string', 'required': True, 'coerce': str},
+        'description': {'type': 'string', 'required': True, 'coerce': str},
+        'git': {'type': 'string', 'required': True, 'coerce': str},
+        'version': {'type': 'string', 'required': True, 'coerce': str},
+        'author': {'type': 'string', 'default': 'User', 'coerce': str},
         'inputs': {
             'type': 'dict',
             'default': {},
@@ -31,17 +31,17 @@ WORKFLOW_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'description': {'type': 'string', 'default': ''},
+                    'description': {'type': 'string', 'default': '', 'coerce': str},
                     'default': {
                         'anyof': [
-                            {'type': 'string'},
-                            {'type': 'list', 'valueschema': {'type': 'string'}}
+                            {'type': 'string', 'coerce': str},
+                            {'type': 'list', 'valueschema': {'type': 'string', 'coerce': str}}
                         ]
                     },
                     'value': {
                         'anyof': [
-                            {'type': 'string'},
-                            {'type': 'list', 'valueschema': {'type': 'string'}}
+                            {'type': 'string', 'coerce': str},
+                            {'type': 'list', 'valueschema': {'type': 'string', 'coerce': str}}
                         ]
                     }
                 }
@@ -54,9 +54,9 @@ WORKFLOW_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'description': {'type': 'string', 'default': ''},
-                    'default': {'type': 'string', 'default': '', 'coerce': (lambda s: str(s))},
-                    'value': {'type': 'string', 'default': '', 'coerce': (lambda s: str(s))}
+                    'description': {'type': 'string', 'default': '', 'coerce': str},
+                    'default': {'type': 'string', 'default': '', 'coerce': str},
+                    'value': {'type': 'string', 'default': '', 'coerce': str}
                 }
             }
         },
@@ -154,11 +154,11 @@ APP_SCHEMA = {
             'allowed': ['app']
         },
         'app_id': {'type': 'string', 'default': ''},
-        'name': {'type': 'string', 'default': ''},
-        'description': {'type': 'string', 'maxlength': 64, 'default': ''},
-        'git': {'type': 'string', 'default': ''},
-        'version': {'type': 'string', 'default': ''},
-        'author': {'type': 'string', 'default': ''},
+        'name': {'type': 'string', 'default': '', 'coerce': str},
+        'description': {'type': 'string', 'maxlength': 64, 'default': '', 'coerce': str},
+        'git': {'type': 'string', 'default': '', 'coerce': str},
+        'version': {'type': 'string', 'default': '', 'coerce': str},
+        'author': {'type': 'string', 'default': '', 'coerce': str},
         'inputs': {
             'type': 'dict',
             'default': {},
@@ -166,7 +166,7 @@ APP_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'description': {'type': 'string', 'default': ''},
+                    'description': {'type': 'string', 'default': '', 'coerce': str},
                     'default': {'type': 'string', 'default': ''},
                     'value': {'type': 'string', 'default': ''},
                     'script_default': {'type': 'string', 'default': ''},
