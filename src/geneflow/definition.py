@@ -34,14 +34,14 @@ WORKFLOW_SCHEMA = {
                     'description': {'type': 'string', 'default': '', 'coerce': str},
                     'default': {
                         'anyof': [
-                            {'type': 'string', 'coerce': str},
-                            {'type': 'list', 'valueschema': {'type': 'string', 'coerce': str}}
+                            {'type': 'string'},
+                            {'type': 'list', 'valueschema': {'type': 'string'}}
                         ]
                     },
                     'value': {
                         'anyof': [
-                            {'type': 'string', 'coerce': str},
-                            {'type': 'list', 'valueschema': {'type': 'string', 'coerce': str}}
+                            {'type': 'string'},
+                            {'type': 'list', 'valueschema': {'type': 'string'}}
                         ]
                     }
                 }
@@ -61,7 +61,12 @@ WORKFLOW_SCHEMA = {
             }
         },
         'final_output': {
-            'type': 'list', 'schema': {'type': 'string'}, 'default': []
+            'type': 'list',
+            'schema': {
+                'type': 'string',
+                'coerce': str
+            },
+            'default': []
         },
         'apps': {
             'type': 'dict',
@@ -70,8 +75,57 @@ WORKFLOW_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'git': {'type': 'string', 'default': ''},
-                    'version': {'type': 'string', 'default': ''}
+                    'git': {'type': 'string', 'default': '', 'coerce': str},
+                    'version': {'type': 'string', 'default': '', 'coerce': str},
+                    'inputs': {
+                        'type': 'dict',
+                        'default': {},
+                        'valueschema': {
+                            'type': 'dict',
+                            'required': True,
+                            'schema': {
+                                'description': {'type': 'string', 'default': '', 'coerce': str},
+                                'default': {'type': 'string', 'default': ''},
+                                'value': {'type': 'string', 'default': ''},
+                                'script_default': {'type': 'string', 'default': ''},
+                                'required': {'type': 'boolean', 'default': False},
+                                'test_value': {'type': 'string', 'default': ''},
+                                'post': {
+                                    'type': 'list',
+                                    'schema': {'type': 'dict'},
+                                    'nullable': True
+                                }
+                            }
+                        }
+                    },
+                    'parameters': {
+                        'type': 'dict',
+                        'default': {},
+                        'valueschema': {
+                            'type': 'dict',
+                            'required': True,
+                            'schema': {
+                                'description': {'type': 'string', 'default': ''},
+                                'default': {'type': 'string', 'default': ''},
+                                'value': {'type': 'string', 'default': ''},
+                                'required': {'type': 'boolean', 'default': False},
+                                'test_value': {'type': 'string', 'default': ''},
+                                'post': {
+                                    'type': 'list',
+                                    'schema': {'type': 'dict'},
+                                    'nullable': True
+                                }
+                            }
+                        }
+                    },
+                    'execution': {
+                        'type': 'dict',
+                        'schema': {
+                            'pre': {'type': 'list', 'default': []},
+                            'methods': {'type': 'list', 'default': []},
+                            'post': {'type': 'list', 'default': []}
+                        }
+                    }
                 }
             }
         },
@@ -82,18 +136,20 @@ WORKFLOW_SCHEMA = {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'step_id': {'type': 'string', 'default': ''},
-                    'name': {'type': 'string', 'default': ''},
-                    'app_id': {'type': 'string', 'default': ''},
+                    'step_id': {'type': 'string', 'default': '', 'coerce': str},
+                    'name': {'type': 'string', 'default': '', 'coerce': str},
+                    'app_id': {'type': 'string', 'default': '', 'coerce': str},
                     'app_name': {
                         'type': 'string',
                         'required': True,
-                        'excludes': 'app'
+                        'excludes': 'app',
+                        'coerce': str
                     },
                     'app': {
                         'type': 'string',
                         'required': True,
-                        'excludes': 'app_name'
+                        'excludes': 'app_name',
+                        'coerce': str
                     },
                     'depend': {'type': 'list', 'default': []},
                     'number': {'type': 'integer', 'default': 0},

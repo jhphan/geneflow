@@ -219,6 +219,12 @@ class WorkflowInstaller:
         for app in self._workflow['apps']:
             if self._app_name == app or not self._app_name:
 
+
+                # check if git and version fields are there
+                    # install from git
+
+                # else write yaml based on inline definition
+
                 Log.some().info(
                     'app: %s:%s [%s]',
                     app,
@@ -241,6 +247,8 @@ class WorkflowInstaller:
                 if not app_installer.clone_git_repo():
                     Log.an().error('cannot clone app to %s', str(repo_path))
                     return False
+
+                    ## resume from here if installing inline
 
                 if not app_installer.load_app():
                     Log.an().error('cannot load app config')

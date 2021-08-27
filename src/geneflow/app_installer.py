@@ -115,6 +115,12 @@ class AppInstaller:
         return True
 
 
+    def write_app_yaml(self):
+
+        ## write out an app.yaml file based on what's in _app_info
+
+        return True
+
     def load_app(self):
         """
         Load app definition.
