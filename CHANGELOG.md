@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 2021/08/13 - v3.0.0-alpha.1: major enhancement/simplification release
+## 2021/09/01 - v3.0.0-alpha.1: major enhancement/simplification release
 
 1. Remove Gooey (GUI) support.
 
@@ -10,6 +10,10 @@
 3. Remove Agave/Tapis support. 
 
 4. Remove "notifications" section from job definition.
+
+5. Add support for inline apps in workflow definition.
+
+6. Change final_output to publish in definition.
 
 
 ## 2021/06/01 - v2.6.0: enhancement release

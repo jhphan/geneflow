@@ -443,7 +443,7 @@ fi
 {{ key|upper }}_FULL=$(readlink -f "${{ '{' }}{{ key|upper }}{{ '}' }}")
 {{ key|upper }}_DIR=$(dirname "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
 {{ key|upper }}_BASE=$(basename "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
-{% for exec_item in value.post_exec %}
+{% for exec_item in value.post %}
 {{ exec(exec_item) }}
 {% endfor %}
 {% else %}
@@ -465,7 +465,7 @@ if [ -n "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
     {{ key|upper }}_FULL=$(readlink -f "${{ '{' }}{{ key|upper }}{{ '}' }}")
     {{ key|upper }}_DIR=$(dirname "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
     {{ key|upper }}_BASE=$(basename "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
-    {% for exec_item in value.post_exec %}
+    {% for exec_item in value.post %}
     {{ exec(exec_item) }}
     {% endfor %}
 fi
@@ -486,7 +486,7 @@ if [ -n "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
     LOG_FULL="${OUTPUT_DIR}/_log"
     TMP_FULL="${OUTPUT_DIR}/_tmp"
     {% endif %}
-    {% for exec_item in value.post_exec %}
+    {% for exec_item in value.post %}
     {{ exec(exec_item) }}
     {% endfor %}
 else

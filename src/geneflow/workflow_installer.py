@@ -219,19 +219,11 @@ class WorkflowInstaller:
         for app in self._workflow['apps']:
             if self._app_name == app or not self._app_name:
 
-
-                # check if git and version fields are there
-                    # install from git
-
-                # else write yaml based on inline definition
-
                 Log.some().info(
-                    'app: %s:%s [%s]',
-                    app,
-                    self._workflow['apps'][app]['git'],
-                    self._workflow['apps'][app]['version']
+                    'app: %s', app
                 )
 
+                # determine path to install app
                 repo_path = apps_path / slugify(app, regex_pattern=r'[^-a-z0-9_]+')
 
                 # create AppInstaller instance
@@ -239,16 +231,36 @@ class WorkflowInstaller:
                     str(repo_path),
                     {
                         'name': app,
+                        'gfVersion': self._workflow['gfVersion'],
+                        'class': 'app',
                         **self._workflow['apps'][app]
                     }
                 )
 
-                # clone app into install location
-                if not app_installer.clone_git_repo():
-                    Log.an().error('cannot clone app to %s', str(repo_path))
-                    return False
+                # check if git and/or version fields are there
+                if (self._workflow['apps'][app]['git']):
+                    Log.some().info(
+                        'app from git repo: %s:%s [%s]',
+                        app,
+                        self._workflow['apps'][app]['git'],
+                        self._workflow['apps'][app]['version']
+                    )
 
-                    ## resume from here if installing inline
+                    # clone app into install location
+                    if not app_installer.clone_git_repo():
+                        Log.an().error('cannot clone app to %s', str(repo_path))
+                        return False
+
+                else: 
+                    Log.some().info(
+                        'app from inline definition: %s',
+                        app
+                    )
+
+                    # write app.yaml based on inline definition
+                    if not app_installer.write_app_yaml():
+                        Log.an().error('cannot write app yaml')
+                        return False
 
                 if not app_installer.load_app():
                     Log.an().error('cannot load app config')

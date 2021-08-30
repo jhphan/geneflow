@@ -116,10 +116,22 @@ class AppInstaller:
 
 
     def write_app_yaml(self):
-
         ## write out an app.yaml file based on what's in _app_info
 
+        # create app folder
+        self._path.mkdir(exist_ok=True)
+
+        app_yaml_path = str(Path(self._path / 'app.yaml'))
+
+        try:
+            with open(app_yaml_path, 'w') as yaml_file:
+                yaml.dump(self._app_info, yaml_file)
+        except yaml.YAMLError as err:
+            Log.an().warning('error writing yaml file: %s', app_yaml_path)
+            return False
+
         return True
+
 
     def load_app(self):
         """

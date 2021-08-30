@@ -35,7 +35,7 @@ class WorkflowDAG:
 
         Args:
             workflow: dict of workflow, updated to include any inputs,
-                parameters, and final_output specified in the job.
+                parameters, and publish steps specified in the job.
             apps: dict of apps:
                 {
                     'app1': { app dict },
@@ -495,7 +495,7 @@ class WorkflowDAG:
                 raise WorkflowDAGException(msg)
 
             contexts = {source_data_context: ''}
-            if step_name in self._workflow['final_output']:
+            if step_name in self._workflow['publish']:
                 contexts['final'] = ''
 
             try:

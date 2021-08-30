@@ -60,7 +60,7 @@ WORKFLOW_SCHEMA = {
                 }
             }
         },
-        'final_output': {
+        'publish': {
             'type': 'list',
             'schema': {
                 'type': 'string',
@@ -79,44 +79,11 @@ WORKFLOW_SCHEMA = {
                     'version': {'type': 'string', 'default': '', 'coerce': str},
                     'inputs': {
                         'type': 'dict',
-                        'default': {},
-                        'valueschema': {
-                            'type': 'dict',
-                            'required': True,
-                            'schema': {
-                                'description': {'type': 'string', 'default': '', 'coerce': str},
-                                'default': {'type': 'string', 'default': ''},
-                                'value': {'type': 'string', 'default': ''},
-                                'script_default': {'type': 'string', 'default': ''},
-                                'required': {'type': 'boolean', 'default': False},
-                                'test_value': {'type': 'string', 'default': ''},
-                                'post': {
-                                    'type': 'list',
-                                    'schema': {'type': 'dict'},
-                                    'nullable': True
-                                }
-                            }
-                        }
+                        'default': {}
                     },
                     'parameters': {
                         'type': 'dict',
-                        'default': {},
-                        'valueschema': {
-                            'type': 'dict',
-                            'required': True,
-                            'schema': {
-                                'description': {'type': 'string', 'default': ''},
-                                'default': {'type': 'string', 'default': ''},
-                                'value': {'type': 'string', 'default': ''},
-                                'required': {'type': 'boolean', 'default': False},
-                                'test_value': {'type': 'string', 'default': ''},
-                                'post': {
-                                    'type': 'list',
-                                    'schema': {'type': 'dict'},
-                                    'nullable': True
-                                }
-                            }
-                        }
+                        'default': {}
                     },
                     'execution': {
                         'type': 'dict',
@@ -171,6 +138,7 @@ WORKFLOW_SCHEMA = {
                             'output': {'type': 'string', 'required': True}
                         }
                     },
+                    'publish': {'type': 'boolean', 'default': False},
                     'execution': {
                         'type': 'dict',
                         'default': {'context': 'local', 'method': 'auto', 'parameters': {}},
@@ -220,7 +188,7 @@ APP_SCHEMA = {
             'default': {},
             'valueschema': {
                 'type': 'dict',
-                'required': True,
+                'default': {'description': ''},
                 'schema': {
                     'description': {'type': 'string', 'default': '', 'coerce': str},
                     'default': {'type': 'string', 'default': ''},
@@ -241,7 +209,7 @@ APP_SCHEMA = {
             'default': {},
             'valueschema': {
                 'type': 'dict',
-                'required': True,
+                'default': {'description': ''},
                 'schema': {
                     'description': {'type': 'string', 'default': ''},
                     'default': {'type': 'string', 'default': ''},
@@ -313,7 +281,7 @@ JOB_SCHEMA = {
         'parameters': {
             'type': 'dict', 'default': {}
         },
-        'final_output': {
+        'publish': {
             'type': 'list', 'schema': {'type': 'string'}, 'default': []
         },
         'execution': {

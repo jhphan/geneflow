@@ -41,7 +41,7 @@ class WorkflowEntity(Base):
     author = Column(String, default='')
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
-    final_output = Column(Text, default='')
+    publish = Column(Text, default='')
     apps = Column(Text, default='')
     created = Column(DateTime, default=datetime.datetime.now)
     modified = Column(DateTime, default=datetime.datetime.now)
@@ -91,6 +91,7 @@ class StepEntity(Base):
     map_glob = Column(String, default='*')
     map_regex = Column(String, default='')
     template = Column(Text, default='')
+    publish = Column(Boolean, default=False)
     exec_context = Column(String, default='local')
     exec_method = Column(String, default='auto')
     exec_parameters = Column(Text, default='')
@@ -115,7 +116,7 @@ class JobEntity(Base):
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
     output_uri = Column(String, default='')
-    final_output = Column(Text, default='')
+    publish = Column(Text, default='')
     exec_context = Column(Text, default='')
     exec_method = Column(Text, default='')
     exec_parameters = Column(Text, default='')
@@ -269,7 +270,7 @@ class DataSource:
                 JobEntity.no_output_hash,
                 JobEntity.inputs,
                 JobEntity.parameters,
-                JobEntity.final_output,
+                JobEntity.publish,
                 JobEntity.exec_context,
                 JobEntity.exec_method,
                 JobEntity.exec_parameters
@@ -290,7 +291,7 @@ class DataSource:
                     'no_output_hash': row[7],
                     'inputs': json.loads(row[8]),
                     'parameters': json.loads(row[9]),
-                    'final_output': json.loads(row[10]),
+                    'publish': json.loads(row[10]),
                     'execution': {
                         'context': json.loads(row[11]),
                         'method': json.loads(row[12]),
@@ -364,6 +365,7 @@ class DataSource:
                 StepEntity.map_glob,
                 StepEntity.map_regex,
                 StepEntity.template,
+                StepEntity.publish,
                 StepEntity.exec_context,
                 StepEntity.exec_method,
                 StepEntity.exec_parameters
@@ -387,10 +389,11 @@ class DataSource:
                         'regex': row[9],
                     },
                     'template': json.loads(row[10]),
+                    'publish': row[11],
                     'execution': {
-                        'context': row[11],
-                        'method': row[12],
-                        'parameters': json.loads(row[13])
+                        'context': row[12],
+                        'method': row[13],
+                        'parameters': json.loads(row[14])
                     },
                     'depend': []
                 } for row in result
@@ -437,7 +440,7 @@ class DataSource:
                 WorkflowEntity.version,
                 WorkflowEntity.inputs,
                 WorkflowEntity.parameters,
-                WorkflowEntity.final_output,
+                WorkflowEntity.publish,
                 WorkflowEntity.apps
             ).\
                 filter(WorkflowEntity.id == workflow_id).\
@@ -453,7 +456,7 @@ class DataSource:
                     'version': row[5],
                     'inputs': json.loads(row[6]),
                     'parameters': json.loads(row[7]),
-                    'final_output': json.loads(row[8]),
+                    'publish': json.loads(row[8]),
                     'apps': json.loads(row[9]),
                     'steps': {}
                 } for row in result
@@ -633,7 +636,7 @@ class DataSource:
                 version=data['version'],
                 inputs=data['inputs'],
                 parameters=data['parameters'],
-                final_output=data['final_output'],
+                publish=data['publish'],
                 apps=data['apps'],
                 created=None,
                 modified=None
@@ -1097,6 +1100,7 @@ class DataSource:
                 map_glob=data['map_glob'],
                 map_regex=data['map_regex'],
                 template=data['template'],
+                publish=data['publish'],
                 exec_context=data['exec_context'],
                 exec_method=data['exec_method'],
                 exec_parameters=data['exec_parameters']
@@ -1273,7 +1277,7 @@ class DataSource:
         Args:
             data: a dictionary with the following keys:
                   ['workflow_id', 'name', 'username', 'work_uri', 'no_output_hash',
-                  'inputs', 'parameters', 'output_uri','final_output',
+                  'inputs', 'parameters', 'output_uri','publish',
                   'exec_context', 'exec_method', 'exec_parameters']
         Returns:
             On success: id of the added job.
@@ -1292,7 +1296,7 @@ class DataSource:
                 inputs=data['inputs'],
                 parameters=data['parameters'],
                 output_uri=data['output_uri'],
-                final_output=data['final_output'],
+                publish=data['publish'],
                 exec_context=data['exec_context'],
                 exec_method=data['exec_method'],
                 exec_parameters=data['exec_parameters']
@@ -2007,6 +2011,7 @@ class DataSource:
                 'map_glob': step['map']['glob'],
                 'map_regex': step['map']['regex'],
                 'template': json.dumps(step['template']),
+                'publish': step['publish'],
                 'exec_context': step['execution']['context'],
                 'exec_method': step['execution']['method'],
                 'exec_parameters': json.dumps(step['execution']['parameters'])
@@ -2064,6 +2069,7 @@ class DataSource:
                         'map_glob': step['map']['glob'],
                         'map_regex': step['map']['regex'],
                         'template': json.dumps(step['template']),
+                        'publish': step['publish'],
                         'exec_context': step['execution']['context'],
                         'exec_method': step['execution']['method'],
                         'exec_parameters': json.dumps(step['execution']['parameters'])
@@ -2163,7 +2169,7 @@ class DataSource:
                 'apps': json.dumps(valid_def['apps']),
                 'git': valid_def['git'],
                 'parameters': json.dumps(valid_def['parameters']),
-                'final_output': json.dumps(valid_def['final_output']),
+                'publish': json.dumps(valid_def['publish']),
                 'version': valid_def['version']
             })
             if not workflow_id:
@@ -2315,7 +2321,7 @@ class DataSource:
                     'git': valid_def['git'],
                     'inputs': json.dumps(valid_def['inputs']),
                     'parameters': json.dumps(valid_def['parameters']),
-                    'final_output': json.dumps(valid_def['final_output']),
+                    'publish': json.dumps(valid_def['publish']),
                     'apps': json.dumps(valid_def['apps']),
                     'version': valid_def['version']
                 }
@@ -2469,7 +2475,7 @@ class DataSource:
                 'inputs': json.dumps(valid_def['inputs']),
                 'parameters': json.dumps(valid_def['parameters']),
                 'output_uri': valid_def['output_uri'],
-                'final_output': json.dumps(valid_def['final_output']),
+                'publish': json.dumps(valid_def['publish']),
                 'exec_context': json.dumps(valid_def['execution']['context']),
                 'exec_method': json.dumps(valid_def['execution']['method']),
                 'exec_parameters': json.dumps(valid_def['execution']['parameters'])
