@@ -3,6 +3,7 @@
 
 from slugify import slugify
 from wcmatch import glob
+import pprint
 
 from geneflow.log import Log
 from geneflow.workflow_step import WorkflowStep
@@ -278,7 +279,9 @@ class LocalStep(WorkflowStep):
                     param_key, parameters[param_key]
                 )
 
-        # add exeuction method
+        pprint.pprint(self._step['execution']['parameters'])
+
+        # add execution method
         cmd += ' --exec_method="{}"'.format(self._step['execution']['method'])
 
         # specify execution init commands if 'init' param given

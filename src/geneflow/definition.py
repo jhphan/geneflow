@@ -26,6 +26,7 @@ WORKFLOW_SCHEMA = {
         'author': {'type': 'string', 'default': 'User', 'coerce': str},
         'inputs': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
                 'type': 'dict',
@@ -49,6 +50,7 @@ WORKFLOW_SCHEMA = {
         },
         'parameters': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
                 'type': 'dict',
@@ -70,6 +72,7 @@ WORKFLOW_SCHEMA = {
         },
         'apps': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'required': True,
             'valueschema': {
                 'type': 'dict',
@@ -79,10 +82,17 @@ WORKFLOW_SCHEMA = {
                     'version': {'type': 'string', 'default': '', 'coerce': str},
                     'inputs': {
                         'type': 'dict',
+                        'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
                         'default': {}
                     },
                     'parameters': {
                         'type': 'dict',
+                        'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
+                        'default': {}
+                    },
+                    'images': {
+                        'type': 'dict',
+                        'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
                         'default': {}
                     },
                     'execution': {
@@ -98,6 +108,7 @@ WORKFLOW_SCHEMA = {
         },
         'steps': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'required': True,
             'valueschema': {
                 'type': 'dict',
@@ -133,6 +144,7 @@ WORKFLOW_SCHEMA = {
                     },
                     'template': {
                         'type': 'dict',
+                        'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
                         'allow_unknown': True,
                         'schema': {
                             'output': {'type': 'string', 'required': True}
@@ -154,6 +166,7 @@ WORKFLOW_SCHEMA = {
                             },
                             'parameters': {
                                 'type': 'dict',
+                                'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
                                 'allow_unknown': True,
                                 'default': {}
                             }
@@ -185,6 +198,7 @@ APP_SCHEMA = {
         'author': {'type': 'string', 'default': '', 'coerce': str},
         'inputs': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
                 'type': 'dict',
@@ -206,6 +220,7 @@ APP_SCHEMA = {
         },
         'parameters': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
                 'type': 'dict',
@@ -222,6 +237,14 @@ APP_SCHEMA = {
                         'nullable': True
                     }
                 }
+            }
+        },
+        'images': {
+            'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
+            'default': {},
+            'valueschema': {
+                'type': 'string', 'default': '', 'coerce': str
             }
         },
         'execution': {

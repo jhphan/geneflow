@@ -110,6 +110,15 @@
         {%- set run_type = 'shell' -%}
     {%- endif -%}
     {%- if run_type in ['singularity','docker'] -%}
+    	if ! [[ "{{ run.image|upper }}" =~ [^a-zA-Z0-9_\$] ]]; then{{ ' ' -}}
+            if [ -n "{{ '${' }}IMAGE_{{ run.image|upper }}{{ '}' }}" ]; then{{ ' ' -}}
+                RUN_IMAGE="{{ '${' }}IMAGE_{{ run.image|upper }}{{ '}' }}";{{ ' ' -}}
+            else{{ ' ' -}}
+                RUN_IMAGE="{{ run.image }}";{{ ' ' -}}
+            fi;{{ ' ' -}}
+        else{{ ' ' -}}
+            RUN_IMAGE="{{ run.image }}";{{ ' ' -}}
+        fi;{{ ' ' -}}
         fnrun{{ loop_index }}() { echo "{{ run.run }}" | sed 's/>/\\>/g' | sed 's/</\\</g' | sed 's/|/\\|/g'; };{{ ' ' -}}
         eval "RUN_LIST=($(fnrun{{ loop_index }}))"; RUN=${RUN_LIST[0]};{{ ' ' -}}
         for (( ri=1; ri<{{ '${#' }}RUN_LIST[@]}; ri++ )); do{{ ' ' -}}
@@ -173,7 +182,7 @@
         {%- else -%}
             -s exec{{ ' ' }}
         {%- endif -%}
-        ${MNT} {{ run.image }} ${RUN} ${ARG}";{{ ' ' }}
+        ${MNT} ${RUN_IMAGE} ${RUN} ${ARG}";{{ ' ' }}
     {%- elif run_type == 'docker' -%}
         CMD{{ loop_index }}="docker{{ ' ' }}
         {%- if run.options -%}
@@ -181,7 +190,7 @@
         {%- else -%}
             run --rm{{ ' ' }}
         {%- endif -%}
-        ${MNT} {{ run.image }} ${RUN} ${ARG}";{{ ' ' }}
+        ${MNT} ${RUN_IMAGE} ${RUN} ${ARG}";{{ ' ' }}
     {%- else -%}
         CMD{{ loop_index }}="{{ run.run }} ${ARG}";{{ ' ' }}
     {%- endif -%}
@@ -330,6 +339,9 @@ eval set -- "$PARSED"
 {{ key|upper }}="{{ value.default }}"
 {% endif %}
 {% endif %}
+{% endfor %}
+{% for key, value in images.items() %}
+IMAGE_{{ key|upper }}="{{ value }}"
 {% endfor %}
 EXEC_METHOD="auto"
 EXEC_INIT=":"
