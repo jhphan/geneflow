@@ -38,14 +38,11 @@ class WorkflowEntity(Base):
     description = Column(String, default='')
     git = Column(String, default='')
     version = Column(String, default='')
-    username = Column(String, default='')
+    author = Column(String, default='')
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
-    final_output = Column(Text, default='')
+    publish = Column(Text, default='')
     apps = Column(Text, default='')
-    public = Column(Boolean, default=False)
-    enable = Column(Boolean, default=True)
-    test = Column(Boolean, default=False)
     created = Column(DateTime, default=datetime.datetime.now)
     modified = Column(DateTime, default=datetime.datetime.now)
 
@@ -60,14 +57,14 @@ class AppEntity(Base):
     description = Column(String, default='')
     git = Column(String, default='')
     version = Column(String, default='')
-    username = Column(String, default='')
+    author = Column(String, default='')
     implementation = Column(Text, default='')
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
-    pre_exec = Column(Text, default='')
+    images = Column(Text, default='')
+    exec_pre = Column(Text, default='')
     exec_methods = Column(Text, default='')
-    post_exec = Column(Text, default='')
-    public = Column(Boolean, default=False)
+    exec_post = Column(Text, default='')
 
 
 class StepDependencyEntity(Base):
@@ -95,6 +92,7 @@ class StepEntity(Base):
     map_glob = Column(String, default='*')
     map_regex = Column(String, default='')
     template = Column(Text, default='')
+    publish = Column(Boolean, default=False)
     exec_context = Column(String, default='local')
     exec_method = Column(String, default='auto')
     exec_parameters = Column(Text, default='')
@@ -119,11 +117,10 @@ class JobEntity(Base):
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
     output_uri = Column(String, default='')
-    final_output = Column(Text, default='')
+    publish = Column(Text, default='')
     exec_context = Column(Text, default='')
     exec_method = Column(Text, default='')
     exec_parameters = Column(Text, default='')
-    notifications = Column(Text, default='[]')
 
 
 class JobStepEntity(Base):
@@ -274,11 +271,10 @@ class DataSource:
                 JobEntity.no_output_hash,
                 JobEntity.inputs,
                 JobEntity.parameters,
-                JobEntity.final_output,
+                JobEntity.publish,
                 JobEntity.exec_context,
                 JobEntity.exec_method,
-                JobEntity.exec_parameters,
-                JobEntity.notifications
+                JobEntity.exec_parameters
             ).\
                 filter(JobEntity.id == job_id).\
                 filter(WorkflowEntity.id == JobEntity.workflow_id).\
@@ -296,13 +292,12 @@ class DataSource:
                     'no_output_hash': row[7],
                     'inputs': json.loads(row[8]),
                     'parameters': json.loads(row[9]),
-                    'final_output': json.loads(row[10]),
+                    'publish': json.loads(row[10]),
                     'execution': {
                         'context': json.loads(row[11]),
                         'method': json.loads(row[12]),
                         'parameters': json.loads(row[13])
-                    },
-                    'notifications': json.loads(row[14])
+                    }
                 } for row in result
             ]
 
@@ -371,6 +366,7 @@ class DataSource:
                 StepEntity.map_glob,
                 StepEntity.map_regex,
                 StepEntity.template,
+                StepEntity.publish,
                 StepEntity.exec_context,
                 StepEntity.exec_method,
                 StepEntity.exec_parameters
@@ -394,10 +390,11 @@ class DataSource:
                         'regex': row[9],
                     },
                     'template': json.loads(row[10]),
+                    'publish': row[11],
                     'execution': {
-                        'context': row[11],
-                        'method': row[12],
-                        'parameters': json.loads(row[13])
+                        'context': row[12],
+                        'method': row[13],
+                        'parameters': json.loads(row[14])
                     },
                     'depend': []
                 } for row in result
@@ -439,16 +436,13 @@ class DataSource:
                 WorkflowEntity.id,
                 WorkflowEntity.name,
                 WorkflowEntity.description,
-                WorkflowEntity.username,
+                WorkflowEntity.author,
                 WorkflowEntity.git,
                 WorkflowEntity.version,
                 WorkflowEntity.inputs,
                 WorkflowEntity.parameters,
-                WorkflowEntity.final_output,
-                WorkflowEntity.apps,
-                WorkflowEntity.public,
-                WorkflowEntity.enable,
-                WorkflowEntity.test
+                WorkflowEntity.publish,
+                WorkflowEntity.apps
             ).\
                 filter(WorkflowEntity.id == workflow_id).\
                 all()
@@ -458,16 +452,13 @@ class DataSource:
                     'workflow_id': row[0],
                     'name': row[1],
                     'description': row[2],
-                    'username': row[3],
+                    'author': row[3],
                     'git': row[4],
                     'version': row[5],
                     'inputs': json.loads(row[6]),
                     'parameters': json.loads(row[7]),
-                    'final_output': json.loads(row[8]),
+                    'publish': json.loads(row[8]),
                     'apps': json.loads(row[9]),
-                    'public': row[10],
-                    'enable': row[11],
-                    'test': row[12],
                     'steps': {}
                 } for row in result
             ]
@@ -515,14 +506,14 @@ class DataSource:
                 AppEntity.description,
                 AppEntity.git,
                 AppEntity.version,
-                AppEntity.public,
-                AppEntity.username,
+                AppEntity.author,
                 AppEntity.inputs,
                 AppEntity.parameters,
+                AppEntity.images,
                 AppEntity.implementation,
-                AppEntity.pre_exec,
+                AppEntity.exec_pre,
                 AppEntity.exec_methods,
-                AppEntity.post_exec
+                AppEntity.exec_post
             ).\
                 filter(StepEntity.workflow_id == workflow_id).\
                 filter(StepEntity.app_id == AppEntity.id).\
@@ -535,14 +526,16 @@ class DataSource:
                     'description': row[2],
                     'git': row[3],
                     'version': row[4],
-                    'public': row[5],
-                    'username': row[6],
-                    'inputs': json.loads(row[7]),
-                    'parameters': json.loads(row[8]),
+                    'author': row[5],
+                    'inputs': json.loads(row[6]),
+                    'parameters': json.loads(row[7]),
+                    'images': json.loads(row[8]),
                     'implementation': json.loads(row[9]),
-                    'pre_exec': json.loads(row[10]),
-                    'exec_methods': json.loads(row[11]),
-                    'post_exec': json.loads(row[12])
+                    'execution': {
+                        'pre': json.loads(row[10]),
+                        'methods': json.loads(row[11]),
+                        'post': json.loads(row[12])
+                    }
                 } for row in result
             }
 
@@ -641,16 +634,13 @@ class DataSource:
                 id=workflow_id,
                 name=data['name'],
                 description=data['description'],
-                username=data['username'],
+                author=data['author'],
                 git=data['git'],
                 version=data['version'],
                 inputs=data['inputs'],
                 parameters=data['parameters'],
-                final_output=data['final_output'],
+                publish=data['publish'],
                 apps=data['apps'],
-                public=data['public'],
-                enable=data['enable'],
-                test=data['test'],
                 created=None,
                 modified=None
             ))
@@ -847,15 +837,14 @@ class DataSource:
                 description=data['description'],
                 git=data['git'],
                 version=data['version'],
-                username=data['username'],
-                public=data['public'],
+                author=data['author'],
                 implementation=data['implementation'],
                 inputs=data['inputs'],
                 parameters=data['parameters'],
-                pre_exec=data['pre_exec'],
+                images=data['images'],
+                exec_pre=data['exec_pre'],
                 exec_methods=data['exec_methods'],
-                post_exec=data['post_exec']
-
+                exec_post=data['exec_post']
             ))
         except SQLAlchemyError as err:
             Log.an().error('sql exception [%s]', str(err))
@@ -1115,6 +1104,7 @@ class DataSource:
                 map_glob=data['map_glob'],
                 map_regex=data['map_regex'],
                 template=data['template'],
+                publish=data['publish'],
                 exec_context=data['exec_context'],
                 exec_method=data['exec_method'],
                 exec_parameters=data['exec_parameters']
@@ -1291,7 +1281,7 @@ class DataSource:
         Args:
             data: a dictionary with the following keys:
                   ['workflow_id', 'name', 'username', 'work_uri', 'no_output_hash',
-                  'inputs', 'parameters', 'output_uri','final_output',
+                  'inputs', 'parameters', 'output_uri','publish',
                   'exec_context', 'exec_method', 'exec_parameters']
         Returns:
             On success: id of the added job.
@@ -1310,11 +1300,10 @@ class DataSource:
                 inputs=data['inputs'],
                 parameters=data['parameters'],
                 output_uri=data['output_uri'],
-                final_output=data['final_output'],
+                publish=data['publish'],
                 exec_context=data['exec_context'],
                 exec_method=data['exec_method'],
-                exec_parameters=data['exec_parameters'],
-                notifications=data['notifications']
+                exec_parameters=data['exec_parameters']
             ))
         except SQLAlchemyError as err:
             Log.an().error('sql exception [%s]', str(err))
@@ -1690,14 +1679,14 @@ class DataSource:
                 'description': valid_def['description'],
                 'git': valid_def['git'],
                 'version': valid_def['version'],
-                'username': valid_def['username'],
-                'public': valid_def['public'],
+                'author': valid_def['author'],
                 'implementation': json.dumps(valid_def['implementation']),
                 'inputs': json.dumps(valid_def['inputs']),
                 'parameters': json.dumps(valid_def['parameters']),
-                'pre_exec': json.dumps(valid_def['pre_exec']),
-                'exec_methods': json.dumps(valid_def['exec_methods']),
-                'post_exec': json.dumps(valid_def['post_exec'])
+                'images': json.dumps(valid_def['images']),
+                'exec_pre': json.dumps(valid_def['execution']['pre']),
+                'exec_methods': json.dumps(valid_def['execution']['methods']),
+                'exec_post': json.dumps(valid_def['execution']['post'])
             })
             if not app_id:
                 Log.an().error(
@@ -1807,14 +1796,14 @@ class DataSource:
                     'description': valid_def['description'],
                     'git': valid_def['git'],
                     'version': valid_def['version'],
-                    'username': valid_def['username'],
-                    'public': valid_def['public'],
+                    'author': valid_def['author'],
                     'implementation': json.dumps(valid_def['implementation']),
                     'inputs': json.dumps(valid_def['inputs']),
                     'parameters': json.dumps(valid_def['parameters']),
-                    'pre_exec': json.dumps(valid_def['pre_exec']),
-                    'exec_methods': json.dumps(valid_def['exec_methods']),
-                    'post_exec': json.dumps(valid_def['post_exec']),
+                    'images': json.dumps(valid_def['images']),
+                    'exec_pre': json.dumps(valid_def['execution']['pre']),
+                    'exec_methods': json.dumps(valid_def['execution']['methods']),
+                    'exec_post': json.dumps(valid_def['execution']['post'])
                 }
         ):
             Log.an().error(
@@ -2028,6 +2017,7 @@ class DataSource:
                 'map_glob': step['map']['glob'],
                 'map_regex': step['map']['regex'],
                 'template': json.dumps(step['template']),
+                'publish': step['publish'],
                 'exec_context': step['execution']['context'],
                 'exec_method': step['execution']['method'],
                 'exec_parameters': json.dumps(step['execution']['parameters'])
@@ -2085,6 +2075,7 @@ class DataSource:
                         'map_glob': step['map']['glob'],
                         'map_regex': step['map']['regex'],
                         'template': json.dumps(step['template']),
+                        'publish': step['publish'],
                         'exec_context': step['execution']['context'],
                         'exec_method': step['execution']['method'],
                         'exec_parameters': json.dumps(step['execution']['parameters'])
@@ -2179,15 +2170,12 @@ class DataSource:
             workflow_id = self.add_workflow({
                 'name': valid_def['name'],
                 'description': valid_def['description'],
-                'username': valid_def['username'],
+                'author': valid_def['author'],
                 'inputs': json.dumps(valid_def['inputs']),
                 'apps': json.dumps(valid_def['apps']),
                 'git': valid_def['git'],
                 'parameters': json.dumps(valid_def['parameters']),
-                'final_output': json.dumps(valid_def['final_output']),
-                'public': valid_def['public'],
-                'enable': valid_def['enable'],
-                'test': valid_def['test'],
+                'publish': json.dumps(valid_def['publish']),
                 'version': valid_def['version']
             })
             if not workflow_id:
@@ -2335,15 +2323,12 @@ class DataSource:
                 {
                     'name': valid_def['name'],
                     'description': valid_def['description'],
-                    'username': valid_def['username'],
+                    'author': valid_def['author'],
                     'git': valid_def['git'],
                     'inputs': json.dumps(valid_def['inputs']),
                     'parameters': json.dumps(valid_def['parameters']),
-                    'final_output': json.dumps(valid_def['final_output']),
+                    'publish': json.dumps(valid_def['publish']),
                     'apps': json.dumps(valid_def['apps']),
-                    'public': valid_def['public'],
-                    'enable': valid_def['enable'],
-                    'test': valid_def['test'],
                     'version': valid_def['version']
                 }
         ):
@@ -2496,11 +2481,10 @@ class DataSource:
                 'inputs': json.dumps(valid_def['inputs']),
                 'parameters': json.dumps(valid_def['parameters']),
                 'output_uri': valid_def['output_uri'],
-                'final_output': json.dumps(valid_def['final_output']),
+                'publish': json.dumps(valid_def['publish']),
                 'exec_context': json.dumps(valid_def['execution']['context']),
                 'exec_method': json.dumps(valid_def['execution']['method']),
-                'exec_parameters': json.dumps(valid_def['execution']['parameters']),
-                'notifications': json.dumps(valid_def['notifications'])
+                'exec_parameters': json.dumps(valid_def['execution']['parameters'])
             })
             if not job_id:
                 Log.an().error(

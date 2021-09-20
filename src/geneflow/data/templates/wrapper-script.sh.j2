@@ -110,8 +110,9 @@
         {%- set run_type = 'shell' -%}
     {%- endif -%}
     {%- if run_type in ['singularity','docker'] -%}
+        RUN_IMAGE="{{ '${' }}IMAGE_{{ run.image|upper }}{{ '}' }}";{{ ' ' -}}
         fnrun{{ loop_index }}() { echo "{{ run.run }}" | sed 's/>/\\>/g' | sed 's/</\\</g' | sed 's/|/\\|/g'; };{{ ' ' -}}
-        RUN_FULL='{{ run.run }}'; eval "RUN_LIST=($(fnrun{{ loop_index }}))"; RUN=${RUN_LIST[0]};{{ ' ' -}}
+        eval "RUN_LIST=($(fnrun{{ loop_index }}))"; RUN=${RUN_LIST[0]};{{ ' ' -}}
         for (( ri=1; ri<{{ '${#' }}RUN_LIST[@]}; ri++ )); do{{ ' ' -}}
             if [ "${RUN_LIST[$ri]:0:1}" = "^" ]; then{{ ' ' -}}
                 RARG="${RUN_LIST[$ri]#?}";{{ ' ' -}}
@@ -173,7 +174,7 @@
         {%- else -%}
             -s exec{{ ' ' }}
         {%- endif -%}
-        ${MNT} {{ run.image }} ${RUN} ${ARG}";{{ ' ' }}
+        ${MNT} ${RUN_IMAGE} ${RUN} ${ARG}";{{ ' ' }}
     {%- elif run_type == 'docker' -%}
         CMD{{ loop_index }}="docker{{ ' ' }}
         {%- if run.options -%}
@@ -181,7 +182,7 @@
         {%- else -%}
             run --rm{{ ' ' }}
         {%- endif -%}
-        ${MNT} {{ run.image }} ${RUN} ${ARG}";{{ ' ' }}
+        ${MNT} ${RUN_IMAGE} ${RUN} ${ARG}";{{ ' ' }}
     {%- else -%}
         CMD{{ loop_index }}="{{ run.run }} ${ARG}";{{ ' ' }}
     {%- endif -%}
@@ -208,10 +209,10 @@
 usage () {
     echo "Usage: $(basename "$0")"
     {% for key, value in inputs.items() %}
-    echo "  --{{ key }} => {{ value.label }}"
+    echo "  --{{ key }} => {{ value.description }}"
     {% endfor %}
     {% for key, value in parameters.items() %}
-    echo "  --{{ key }} => {{ value.label }}"
+    echo "  --{{ key }} => {{ value.description }}"
     {% endfor %}
     echo "  --exec_method => Execution method (
         {%- for exec_method in exec_methods -%}
@@ -269,13 +270,9 @@ contains() {
 ## SCRIPT_DIR: directory of current script, depends on execution
 ## environment, which may be detectable using environment variables
 ###############################################################################
-if [ -z "${AGAVE_JOB_ID}" ]; then
-    # not an agave job
-    SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
-else
-    echo "Agave job detected"
-    SCRIPT_DIR=$(pwd)
-fi
+
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+
 ## ****************************************************************************
 
 
@@ -299,6 +296,9 @@ LONGOPTIONS=help,exec_method:,exec_init:,
 {%- endfor -%}
 {%- for key, value in parameters.items() -%}
     {{- key -}}:,
+{%- endfor -%}
+{%- for key, value in images.items() -%}
+    image_{{- key -}}:
 {%- endfor %}
 
 ## ****************************************************************************
@@ -334,6 +334,9 @@ eval set -- "$PARSED"
 {{ key|upper }}="{{ value.default }}"
 {% endif %}
 {% endif %}
+{% endfor %}
+{% for key, value in images.items() %}
+IMAGE_{{ key|upper }}="{{ value }}"
 {% endfor %}
 EXEC_METHOD="auto"
 EXEC_INIT=":"
@@ -371,6 +374,16 @@ while true; do
             shift 2
             ;;
         {% endfor %}
+	{% for key, value in images.items() %}
+	--image_{{ key }})
+	    if [ -z "${{ '{' }}image_{{ key }}{{ '}' }}" ]; then
+		IMAGE_{{ key|upper }}=$2
+    	    else
+		IMAGE_{{ key|upper }}="${{ '{' }}image_{{ key }}{{ '}' }}"
+	    fi
+	    shift 2
+	    ;;
+	{% endfor %}
         --exec_method)
             if [ -z "${exec_method}" ]; then
                 EXEC_METHOD=$2
@@ -426,40 +439,28 @@ echo "Execution Initialization: ${EXEC_INIT}"
 {% if value.required %}
 
 if [ -z "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    echo "{{ value.label }} required"
+    echo "{{ key }} required"
     echo
     usage
     exit 1
 fi
 # make sure {{ key|upper }} is staged
 count=0
-{% if value.type == 'File' %}
-while [ ! -f "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-{% elif value.type == 'Directory' %}
-while [ ! -d "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-{% else %}
 while [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-{% endif %}
 do
     echo "${{ '{' }}{{ key|upper }}{{ '}' }} not staged, waiting..."
     sleep 1
     count=$((count+1))
     if [ $count == 10 ]; then break; fi
 done
-{% if value.type == 'File' %}
-if [ ! -f "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-{% elif value.type == 'Directory' %}
-if [ ! -d "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-{% else %}
 if [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-{% endif %}
-    echo "{{ value.label }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
+    echo "{{ key }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
     exit 1
 fi
 {{ key|upper }}_FULL=$(readlink -f "${{ '{' }}{{ key|upper }}{{ '}' }}")
 {{ key|upper }}_DIR=$(dirname "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
 {{ key|upper }}_BASE=$(basename "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
-{% for exec_item in value.post_exec %}
+{% for exec_item in value.post %}
 {{ exec(exec_item) }}
 {% endfor %}
 {% else %}
@@ -467,33 +468,21 @@ fi
 if [ -n "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
     # make sure ${{ '{' }}{{ key|upper }}{{ '}' }} is staged
     count=0
-    {% if value.type == 'File' %}
-    while [ ! -f "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-    {% elif value.type == 'Directory' %}
-    while [ ! -d "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-    {% else %}
     while [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]
-    {% endif %}
     do
         echo "${{ '{' }}{{ key|upper }}{{ '}' }} not staged, waiting..."
         sleep 1
         count=$((count+1))
         if [ $count == 10 ]; then break; fi
     done
-    {% if value.type == 'File' %}
-    if [ ! -f "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    {% elif value.type == 'Directory' %}
-    if [ ! -d "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    {% else %}
     if [ ! -e "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
-    {% endif %}
-        echo "{{ value.label }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
+        echo "{{ key }} not found: ${{ '{' }}{{ key|upper }}{{ '}' }}"
         exit 1
     fi
     {{ key|upper }}_FULL=$(readlink -f "${{ '{' }}{{ key|upper }}{{ '}' }}")
     {{ key|upper }}_DIR=$(dirname "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
     {{ key|upper }}_BASE=$(basename "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
-    {% for exec_item in value.post_exec %}
+    {% for exec_item in value.post %}
     {{ exec(exec_item) }}
     {% endfor %}
 fi
@@ -507,22 +496,20 @@ fi
 # {{ key|upper }} parameter
 if [ -n "${{ '{' }}{{ key|upper }}{{ '}' }}" ]; then
     :
-    {% if value.type == 'File' or value.type == 'Directory' or value.type == 'Any' %}
+    {% if key == 'output' %}
     {{ key|upper }}_FULL=$(readlink -f "${{ '{' }}{{ key|upper }}{{ '}' }}")
     {{ key|upper }}_DIR=$(dirname "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
     {{ key|upper }}_BASE=$(basename "${{ '{' }}{{ key|upper }}_FULL{{ '}' }}")
-    {% if key == 'output' %}
     LOG_FULL="${OUTPUT_DIR}/_log"
     TMP_FULL="${OUTPUT_DIR}/_tmp"
     {% endif %}
-    {% endif %}
-    {% for exec_item in value.post_exec %}
+    {% for exec_item in value.post %}
     {{ exec(exec_item) }}
     {% endfor %}
 else
     :
 {% if value.required %}
-    echo "{{ value.label }} required"
+    echo "{{ key }} required"
     echo
     usage
     exit 1
@@ -583,7 +570,7 @@ AUTO_EXEC=${EXEC_METHOD}
 ## Add app-specific paths to detect the execution method.
 if [ "${EXEC_METHOD}" = "auto" ]; then
     # detect execution method
-    {% for exec_method in exec_methods %}
+    {% for exec_method in execution.methods %}
     {% if loop.first %}
     if
     {%- else %}
@@ -610,8 +597,8 @@ fi
 
 ## ****************************************************************************
 ## Add logic to prepare environment for execution
-{% if pre_exec %}
-{% for exec_item in pre_exec %}
+{% if execution.pre %}
+{% for exec_item in execution.pre %}
 {{ exec(exec_item) }}
 {% endfor %}
 {% endif %}
@@ -627,9 +614,9 @@ fi
 ## Add logic to execute app
 ## There should be one case statement for each item in $exec_methods
 case "${AUTO_EXEC}" in
-    {% for exec_method in exec_methods %}
+    {% for exec_method in execution.methods %}
     {{ exec_method.name }})
-        {% for exec_item in exec_method.exec %}
+        {% for exec_item in exec_method.commands %}
         {{ exec(exec_item) }}
         {% endfor %}
         ;;
@@ -645,8 +632,8 @@ esac
 
 ## ****************************************************************************
 ## Add logic to cleanup execution artifacts, if necessary
-{% if post_exec %}
-{% for exec_item in post_exec %}
+{% if execution.post %}
+{% for exec_item in exeuction.post %}
 {{ exec(exec_item) }}
 {% endfor %}
 {% endif %}

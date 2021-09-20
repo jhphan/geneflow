@@ -112,15 +112,13 @@ def help_func(args, other_args, subparser=None):
     print('Inputs: Workflow-Specific Files or Folders')
     for input_key in workflow_dict['inputs']:
         print(
-            '\t--in.{}: {}: {}'.format(
+            '\t--in.{}: {}'.format(
                 input_key,
-                workflow_dict['inputs'][input_key]['label'],
                 workflow_dict['inputs'][input_key]['description']
             )
         )
         print(
-            '\t\ttype: {}, default: {}'.format(
-                workflow_dict['inputs'][input_key]['type'],
+            '\t\tdefault: {}'.format(
                 workflow_dict['inputs'][input_key]['default']
             )
         )
@@ -128,21 +126,19 @@ def help_func(args, other_args, subparser=None):
     print('Parameters: Workflow-Specific Values')
     for param_key in workflow_dict['parameters']:
         print(
-            '\t--param.{}: {}: {}'.format(
+            '\t--param.{}: {}'.format(
                 param_key,
-                workflow_dict['parameters'][param_key]['label'],
                 workflow_dict['parameters'][param_key]['description']
             )
         )
         print(
-            '\t\ttype: {}, default: {}'.format(
-                workflow_dict['parameters'][param_key]['type'],
+            '\t\tdefault: {}'.format(
                 workflow_dict['parameters'][param_key]['default']
             )
         )
     print()
     print('Execution Configuration:')
-    print('\t--ec,--exec-context: Execution contexts, e.g., local, agave, gridengine.')
+    print('\t--ec,--exec-context: Execution contexts, e.g., local, gridengine, slurm.')
     print('\t\tThese can be specified for all workflow steps with "default:[CONTEXT]"')
     print('\t\tor for specific steps with "step-name:[CONTEXT]".')
     print('\t--em,--exec-method: Exeuction methods, e.g., singularity, docker, environment.')
@@ -153,5 +149,20 @@ def help_func(args, other_args, subparser=None):
     print('\t\tThese can be specified for all workflow steps with "default.slots:[VALUE]"')
     print('\t\tor for specific steps with "step-name.slots:[VALUE]". Execution parameters')
     print('\t\tdepend on the execution context.')
+    print()
+    print('Customize Container Images/Environments w/ Execution Parameters:')
+    for step_key in workflow_dict['steps']:
+        for image_key in workflow_dict['apps'][workflow_dict['steps'][step_key]['app']]['images']:
+            print(
+                '\t--ep {}.images.{}'.format(
+                    step_key,
+                    image_key
+                )
+            )
+            print(
+                '\t\tdefault: {}'.format(
+                    workflow_dict['apps'][workflow_dict['steps'][step_key]['app']]['images'][image_key]
+                )
+            )
 
     return True

@@ -111,7 +111,7 @@ class Workflow:
             Log.an().error(msg)
             return self._fatal(msg)
 
-        # initialize context-specific workflow items (e.g., agave connection)
+        # initialize context-specific workflow items (e.g., context connection info)
         if not self._init_workflow_contexts():
             msg = 'cannot initialize context-specific workflow properties'
             Log.an().error(msg)
@@ -123,8 +123,7 @@ class Workflow:
             Log.an().error(msg)
             return self._fatal(msg)
 
-        # initialize context-specific workflow data items (e.g., archive_uri
-        #  for agave)
+        # initialize context-specific workflow data items (e.g., create remote directories)
         if not self._init_workflow_context_data():
             msg = 'cannot initialize context-specific workflow data'
             Log.an().error(msg)
@@ -356,9 +355,16 @@ class Workflow:
                 self._workflow['parameters'][parameter_key]['value']\
                     = self._job['parameters'][parameter_key]
 
-        # update final output
-        if self._job['final_output']:
-            self._workflow['final_output'] = self._job['final_output']
+        # update publish list
+        if self._job['publish']:
+            # over-ride the workflow publish list with the job publish list
+            self._workflow['publish'] = self._job['publish']
+
+        # update the publish list based on publish flag of each step
+        for step_name, step in self._workflow['steps'].items():
+            if step['publish']:
+                if step_name not in self._workflow['publish']:
+                    self._workflow['publish'].append(step_name)
 
         # insert step execution parameters
         for step_name, step in self._workflow['steps'].items():
@@ -837,68 +843,6 @@ class Workflow:
         return True
 
 
-    def _send_notifications(self, status):
-
-        # construct message
-        msg_data = {
-            'to': '',
-            'from': 'geneflow@geneflow.biotech.cdc.gov',
-            'subject': 'GeneFlow Job "{}": {}'.format(
-                self._job['name'], status
-            ),
-            'content': (
-                'Your GeneFlow job status has changed to {}'
-                '\nJob Name: {}'
-                '\nJob ID: {}'
-            ).format(status, self._job['name'], self._job_id)
-        }
-
-        # use agave token as header if available
-        if 'agave' in self._workflow_context:
-            msg_headers = {
-                'Authorization':'Bearer {}'.format(
-                    self._workflow_context['agave']\
-                        .get_context_options()['agave_wrapper']\
-                        ._agave.token.token_info.get('access_token')
-                )
-            }
-
-        else:
-            msg_headers = {}
-
-        Log.some().info('message headers: %s', str(msg_headers))
-
-        for notify in self._job['notifications']:
-            Log.some().info(
-                'sending notification(s) to %s @ %s',
-                str(notify['to']),
-                notify['url'],
-            )
-
-            to_list = notify['to']
-            if isinstance(notify['to'], str):
-                to_list = [notify['to']]
-
-            for to_item in to_list:
-                msg_data['to'] = to_item
-                try:
-                    response = requests.post(
-                        notify['url'], data=msg_data, headers=msg_headers
-                    )
-
-                except requests.exceptions.RequestException as err:
-                    Log.a().warning(
-                        'cannot send notification to %s @ %s: %s',
-                        to_item, notify['url'], str(err)
-                    )
-
-                if response.status_code != 201:
-                    Log.a().warning(
-                        'cannot send notification to %s @ %s: %s',
-                        to_item, notify['url'], response.text
-                    )
-
-
     def _update_status_db(self, status, msg):
         """
         Update workflow status in DB.
@@ -934,11 +878,6 @@ class Workflow:
             if not data_source.set_job_finished(self._job_id):
                 Log.a().warning('cannot set job finish time in data source')
                 data_source.rollback()
-
-        # if state change, contact notification endpoint
-        if status != self._status:
-            if self._job['notifications']:
-                self._send_notifications(status)
 
         # update database
         self._status = status

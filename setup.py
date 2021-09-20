@@ -26,9 +26,9 @@ class PostInstallCommand(install):
         install.run(self)
 
 setup(
-    name='geneflow',
+    name='geneflow3',
     version=VERSION,
-    description="A light-weight platform-agnostic workflow engine for scientific computing.",
+    description="A light-weight, extendable workflow engine for scientific computing.",
     long_description=README,
     classifiers=[
         # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -44,23 +44,21 @@ setup(
         'Programming Language :: Python :: 3 :: Only',
         'Topic :: Scientific/Engineering :: Bio-Informatics'
     ],
-    keywords='workflow agave bioinformatics',
-    author='GeneFlow Development Team',
-    author_email='oamdsupport@cdc.gov',
-    url='https://github.com/CDCgov/geneflow2',
+    keywords='workflow bioinformatics',
+    author='John Phan',
+    author_email='jhphan@gmail.com',
+    url='https://github.com/jhphan/geneflow',
     license='Apache 2.0',
     packages=find_packages('src', exclude=["*.test"]),
     package_dir={'': 'src'},
     package_data={'': ['data/sql/geneflow.sql',
                        'data/sql/geneflow-sqlite.sql',
-                       'data/templates/agave-app-def.json.j2.j2',
                        'data/templates/wrapper-script.sh.j2',
                        'data/templates/test.sh.j2']},
     include_package_data=True,
     zip_safe=False,
     install_requires=INSTALL_REQUIRES,
     extras_require={
-        'tapis': ['agavepy==1.0.0a11'],
         'hpc': ['drmaa']
     },
     python_requires=PYTHON_REQUIRES,

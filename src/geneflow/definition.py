@@ -8,52 +8,41 @@ import yaml
 
 from geneflow.log import Log
 
-GF_VERSION = 'v2.0'
+GF_VERSION = 'v3.0'
 
 WORKFLOW_SCHEMA = {
-    'v2.0': {
+    'v3.0': {
         'gfVersion': {
             'type': 'string', 'default': GF_VERSION, 'allowed': [GF_VERSION]
         },
         'class': {
             'type': 'string', 'default': 'workflow', 'allowed': ['workflow']
         },
-        'workflow_id': {'type': 'string', 'default': ''},
-        'name': {'type': 'string', 'required': True},
-        'description': {'type': 'string', 'required': True},
-        'git': {'type': 'string', 'default': ''},
-        'version': {'type': 'string', 'required': True},
-        'public': {'type': 'boolean', 'default': False},
-        'enable': {'type': 'boolean', 'default': True},
-        'test': {'type': 'boolean', 'default': False},
-        'username': {'type': 'string', 'default': 'user'},
+        'workflow_id': {'type': 'string', 'default': ''}, # db artifact
+        'name': {'type': 'string', 'required': True, 'coerce': str},
+        'description': {'type': 'string', 'required': True, 'coerce': str},
+        'git': {'type': 'string', 'required': True, 'coerce': str},
+        'version': {'type': 'string', 'required': True, 'coerce': str},
+        'author': {'type': 'string', 'default': 'User', 'coerce': str},
         'inputs': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'label': {'type': 'string', 'required': True},
-                    'description': {'type': 'string', 'default': ''},
-                    'type': {
-                        'type': 'string',
-                        'required': True,
-                        'default': 'Any',
-                        'allowed': ['File', 'Directory', 'Any']
-                    },
+                    'description': {'type': 'string', 'default': '', 'coerce': str},
                     'default': {
                         'anyof': [
                             {'type': 'string'},
-                            {'type': 'list', 'valueschema': {'type': 'string'}}
+                            {'type': 'list', 'schema': {'type': 'string'}}
                         ]
                     },
-                    'enable': {'type': 'boolean', 'default': True},
-                    'visible': {'type': 'boolean', 'default': True},
                     'value': {
                         'anyof': [
                             {'type': 'string'},
-                            {'type': 'list', 'valueschema': {'type': 'string'}}
+                            {'type': 'list', 'schema': {'type': 'string'}}
                         ]
                     }
                 }
@@ -61,63 +50,84 @@ WORKFLOW_SCHEMA = {
         },
         'parameters': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'label': {'type': 'string', 'required': True},
-                    'description': {'type': 'string', 'default': ''},
-                    'type': {
-                        'type': 'string',
-                        'required': True,
-                        'default': 'Any',
-                        'allowed': [
-                            'File', 'Directory', 'string', 'int',
-                            'float', 'double', 'long', 'Any'
-                        ]
-                    },
-                    'default': {'nullable': True, 'default': None},
-                    'enable': {'type': 'boolean', 'default': True},
-                    'visible': {'type': 'boolean', 'default': True},
-                    'value': {'nullable': True, 'default': None}
+                    'description': {'type': 'string', 'default': '', 'coerce': str},
+                    'default': {'type': 'string', 'default': '', 'coerce': str},
+                    'value': {'type': 'string', 'default': '', 'coerce': str}
                 }
             }
         },
-        'final_output': {
-            'type': 'list', 'schema': {'type': 'string'}, 'default': []
+        'publish': {
+            'type': 'list',
+            'schema': {
+                'type': 'string',
+                'coerce': str
+            },
+            'default': []
         },
         'apps': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'required': True,
             'valueschema': {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'git': {'type': 'string', 'required': True},
-                    'version': {'type': 'string', 'nullable': True, 'default': None},
+                    'git': {'type': 'string', 'default': '', 'coerce': str},
+                    'version': {'type': 'string', 'default': '', 'coerce': str},
+                    'inputs': {
+                        'type': 'dict',
+                        'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
+                        'default': {}
+                    },
+                    'parameters': {
+                        'type': 'dict',
+                        'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
+                        'default': {}
+                    },
+                    'images': {
+                        'type': 'dict',
+                        'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
+                        'default': {}
+                    },
+                    'execution': {
+                        'type': 'dict',
+                        'schema': {
+                            'pre': {'type': 'list', 'default': []},
+                            'methods': {'type': 'list', 'default': []},
+                            'post': {'type': 'list', 'default': []}
+                        }
+                    }
                 }
             }
         },
         'steps': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'required': True,
             'valueschema': {
                 'type': 'dict',
                 'required': True,
                 'schema': {
-                    'step_id': {'type': 'string', 'default': ''},
-                    'name': {'type': 'string', 'default': ''},
-                    'app_id': {'type': 'string', 'default': ''},
+                    'step_id': {'type': 'string', 'default': '', 'coerce': str},
+                    'name': {'type': 'string', 'default': '', 'coerce': str},
+                    'app_id': {'type': 'string', 'default': '', 'coerce': str},
                     'app_name': {
                         'type': 'string',
                         'required': True,
-                        'excludes': 'app'
+                        'excludes': 'app',
+                        'coerce': str
                     },
                     'app': {
                         'type': 'string',
                         'required': True,
-                        'excludes': 'app_name'
+                        'excludes': 'app_name',
+                        'coerce': str
                     },
                     'depend': {'type': 'list', 'default': []},
                     'number': {'type': 'integer', 'default': 0},
@@ -134,11 +144,13 @@ WORKFLOW_SCHEMA = {
                     },
                     'template': {
                         'type': 'dict',
+                        'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
                         'allow_unknown': True,
                         'schema': {
                             'output': {'type': 'string', 'required': True}
                         }
                     },
+                    'publish': {'type': 'boolean', 'default': False},
                     'execution': {
                         'type': 'dict',
                         'default': {'context': 'local', 'method': 'auto', 'parameters': {}},
@@ -146,7 +158,7 @@ WORKFLOW_SCHEMA = {
                             'context': {
                                 'type': 'string',
                                 'default': 'local',
-                                'allowed': ['local', 'agave', 'tapis', 'gridengine', 'slurm']
+                                'allowed': ['local', 'gridengine', 'slurm']
                             },
                             'method': {
                                 'type': 'string',
@@ -154,6 +166,7 @@ WORKFLOW_SCHEMA = {
                             },
                             'parameters': {
                                 'type': 'dict',
+                                'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
                                 'allow_unknown': True,
                                 'default': {}
                             }
@@ -166,7 +179,7 @@ WORKFLOW_SCHEMA = {
 }
 
 APP_SCHEMA = {
-    'v2.0': {
+    'v3.0': {
         'gfVersion': {
             'type': 'string',
             'default': GF_VERSION,
@@ -178,63 +191,60 @@ APP_SCHEMA = {
             'allowed': ['app']
         },
         'app_id': {'type': 'string', 'default': ''},
-        'name': {'type': 'string', 'required': True},
-        'description': {'type': 'string', 'maxlength': 64, 'required': True},
-        'git': {'type': 'string', 'default': ''},
-        'version': {'type': 'string', 'required': True},
-        'public': {'type': 'boolean', 'default': True},
-        'username': {'type': 'string', 'default': 'user'},
+        'name': {'type': 'string', 'default': '', 'coerce': str},
+        'description': {'type': 'string', 'maxlength': 64, 'default': '', 'coerce': str},
+        'git': {'type': 'string', 'default': '', 'coerce': str},
+        'version': {'type': 'string', 'default': '', 'coerce': str},
+        'author': {'type': 'string', 'default': '', 'coerce': str},
         'inputs': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
                 'type': 'dict',
-                'required': True,
+                'default': {'description': ''},
                 'schema': {
-                    'label': {'type': 'string', 'required': True},
-                    'description': {'type': 'string', 'default': ''},
-                    'type': {
-                        'type': 'string',
-                        'required': True,
-                        'default': 'Any',
-                        'allowed': ['File', 'Directory', 'Any']
-                    },
+                    'description': {'type': 'string', 'default': '', 'coerce': str},
                     'default': {'type': 'string', 'default': ''},
                     'value': {'type': 'string', 'default': ''},
-                    'script_default': {'type': 'string', 'nullable': True},
+                    'script_default': {'type': 'string', 'default': ''},
                     'required': {'type': 'boolean', 'default': False},
-                    'test_value': {'type': 'string', 'nullable': True},
-                    'post_exec': {
+                    'test_value': {'type': 'string', 'default': ''},
+                    'post': {
                         'type': 'list',
-                        'schema': {'type': 'dict'},
-                        'nullable': True
+                        'default': [],
+                        'schema': {
+                            'type': 'dict',
+                            'schema': {
+                                'type': {
+                                    'type': 'string',
+                                    'allowed': ['docker','singularity','shell'],
+                                    'default': 'shell'
+                                },
+                                'image': {'type': 'string', 'coerce': str, 'regex': '[a-zA-Z0-9_]+'},
+                                'if': {'type': 'list', 'default': []},
+                                'else': {'type': 'list', 'default': []},
+                                'run': {'type': 'string', 'coerce': str}
+                            }
+                        }
                     }
                 }
             }
         },
         'parameters': {
             'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
                 'type': 'dict',
-                'required': True,
+                'default': {'description': ''},
                 'schema': {
-                    'label': {'type': 'string', 'required': True},
                     'description': {'type': 'string', 'default': ''},
-                    'type': {
-                        'type': 'string',
-                        'required': True,
-                        'default': 'Any',
-                        'allowed': [
-                            'File', 'Directory', 'string', 'int',
-                            'float', 'double', 'long', 'Any'
-                        ]
-                    },
-                    'default': {'nullable': True, 'default': None},
-                    'value': {'nullable': True, 'default': None},
+                    'default': {'type': 'string', 'default': ''},
+                    'value': {'type': 'string', 'default': ''},
                     'required': {'type': 'boolean', 'default': False},
-                    'test_value': {'nullable': True},
-                    'post_exec': {
+                    'test_value': {'type': 'string', 'default': ''},
+                    'post': {
                         'type': 'list',
                         'schema': {'type': 'dict'},
                         'nullable': True
@@ -242,9 +252,86 @@ APP_SCHEMA = {
                 }
             }
         },
-        'pre_exec': {'type': 'list', 'default': []},
-        'exec_methods': {'type': 'list', 'default': []},
-        'post_exec': {'type': 'list', 'default': []},
+        'images': {
+            'type': 'dict',
+            'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
+            'default': {},
+            'valueschema': {
+                'type': 'string',
+                'default': '',
+                'coerce': str
+            }
+        },
+        'execution': {
+            'type': 'dict',
+            'schema': {
+                'pre': {
+                    'type': 'list',
+                    'default': [],
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'type': {
+                                'type': 'string',
+                                'allowed': ['docker','singularity','shell'],
+                                'default': 'shell'
+                            },
+                            'image': {'type': 'string', 'coerce': str, 'regex': '[a-zA-Z0-9_]+'},
+                            'if': {'type': 'list', 'default': []},
+                            'else': {'type': 'list', 'default': []},
+                            'run': {'type': 'string', 'coerce': str}
+                        }
+                    }
+                },
+                'methods': {
+                    'type': 'list',
+                    'default': [],
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'name': {'type': 'string', 'coerce': str},
+                            'if': {'type': 'list', 'default': []},
+                            'commands': {
+                                'type': 'list', 
+                                'default': [],
+                                'schema': {
+                                    'type': 'dict',
+                                    'schema': {
+                                        'type': {
+                                            'type': 'string',
+                                            'allowed': ['docker','singularity','shell'],
+                                            'default': 'shell'
+                                        },
+                                        'image': {'type': 'string', 'coerce': str, 'regex': '[a-zA-Z0-9_]+'},
+                                        'if': {'type': 'list', 'default': []},
+                                        'else': {'type': 'list', 'default': []},
+                                        'run': {'type': 'string', 'coerce': str}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                'post': {
+                    'type': 'list',
+                    'default': [],
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'type': {
+                                'type': 'string',
+                                'allowed': ['docker','singularity','shell'],
+                                'default': 'shell'
+                            },
+                            'image': {'type': 'string', 'coerce': str, 'regex': '[a-zA-Z0-9_]+'},
+                            'if': {'type': 'list', 'default': []},
+                            'else': {'type': 'list', 'default': []},
+                            'run': {'type': 'string', 'coerce': str}
+                        }
+                    }
+                }
+            }
+        },
         'implementation': {
             'type': 'dict',
             'required': False,
@@ -254,7 +341,7 @@ APP_SCHEMA = {
 }
 
 JOB_SCHEMA = {
-    'v2.0': {
+    'v3.0': {
         'gfVersion': {
             'type': 'string',
             'default': GF_VERSION,
@@ -294,7 +381,7 @@ JOB_SCHEMA = {
         'parameters': {
             'type': 'dict', 'default': {}
         },
-        'final_output': {
+        'publish': {
             'type': 'list', 'schema': {'type': 'string'}, 'default': []
         },
         'execution': {
@@ -320,8 +407,6 @@ JOB_SCHEMA = {
                         'default': 'local',
                         'allowed': [
                             'local',
-                            'agave',
-                            'tapis',
                             'gridengine',
                             'slurm'
                         ]
@@ -358,24 +443,6 @@ JOB_SCHEMA = {
                         'default': {},
                         'allow_unknown': True
                     }
-                }
-            }
-        },
-        'notifications': {
-            'type': 'list',
-            'default': [],
-            'schema': {
-                'type': 'dict',
-                'default': {},
-                'schema': {
-                    'url': {'type': 'string', 'required': True},
-                    'to': {
-                        'anyof': [
-                            {'type': 'string', 'required': True},
-                            {'type': 'list', 'required': True}
-                        ],
-                    },
-                    'events': {'type': 'string', 'default': '*'}
                 }
             }
         }

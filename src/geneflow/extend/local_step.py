@@ -3,6 +3,7 @@
 
 from slugify import slugify
 from wcmatch import glob
+import pprint
 
 from geneflow.log import Log
 from geneflow.workflow_step import WorkflowStep
@@ -278,7 +279,15 @@ class LocalStep(WorkflowStep):
                     param_key, parameters[param_key]
                 )
 
-        # add exeuction method
+        # pass image parameters, if any
+        if 'images' in self._step['execution']['parameters']:
+            for image_key in self._step['execution']['parameters']['images']:
+                cmd += ' --image_{}="{}"'.format(
+                    image_key,
+                    self._step['execution']['parameters']['images'][image_key]
+                )
+
+        # add execution method
         cmd += ' --exec_method="{}"'.format(self._step['execution']['method'])
 
         # specify execution init commands if 'init' param given

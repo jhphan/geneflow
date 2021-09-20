@@ -26,14 +26,14 @@ class URIParser:
     2. There is a slash (/) before the path (everything absolute)
     3. Only Unix style paths with forward slash (/)
     Examples:
-        agave://system/path/
-            scheme: agave
+        http://system/path/
+            scheme: http
             authority: system
             path: /path/
             folder: /path
             name: path
-        agave://system/path
-            scheme: agave
+        http://system/path
+            scheme: http
             authority: system
             path: /path
             folder: /
@@ -90,7 +90,7 @@ class URIParser:
             Log.a().debug('invalid uri: %s', uri)
             return False
 
-        # extract scheme, e.g., local, agave, http, etc.
+        # extract scheme, e.g., local, http, etc.
         scheme = matched.group(2)
         if not scheme:
             scheme = 'local'

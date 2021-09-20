@@ -14,15 +14,12 @@ CREATE TABLE workflow (
     name VARCHAR(256) NOT NULL,
     description VARCHAR(256) NOT NULL DEFAULT '',
     version VARCHAR(32) NOT NULL DEFAULT '',
-    username VARCHAR(32) NOT NULL DEFAULT '',
+    author VARCHAR(32) NOT NULL DEFAULT '',
     git TEXT NOT NULL DEFAULT '',
     inputs TEXT NOT NULL DEFAULT '',
     parameters TEXT NOT NULL DEFAULT '',
-    final_output TEXT NOT NULL DEFAULT '',
+    publish TEXT NOT NULL DEFAULT '',
     apps TEXT NOT NULL DEFAULT '',
-    public TINYINT NOT NULL DEFAULT 0,
-    enable TINYINT NOT NULL DEFAULT 1,
-    test TINYINT NOT NULL DEFAULT 0,
     created TIMESTAMP DEFAULT '0000-00-00 00:00:00',
     modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
@@ -41,14 +38,14 @@ CREATE TABLE app (
     description VARCHAR(256) NOT NULL DEFAULT '',
     git TEXT NOT NULL DEFAULT '',
     version VARCHAR(32) NOT NULL DEFAULT '',
-    username VARCHAR(32) NOT NULL DEFAULT '',
+    author VARCHAR(32) NOT NULL DEFAULT '',
     implementation TEXT NOT NULL DEFAULT '',
     inputs TEXT NOT NULL DEFAULT '',
     parameters TEXT NOT NULL DEFAULT '',
-    public TINYINT NOT NULL DEFAULT 0,
-    pre_exec TEXT NOT NULL DEFAULT '',
+    images TEXT NOT NULL DEFAULT '',
+    exec_pre TEXT NOT NULL DEFAULT '',
     exec_methods TEXT NOT NULL DEFAULT '',
-    post_exec TEXT NOT NULL DEFAULT '',
+    exec_post TEXT NOT NULL DEFAULT '',
     PRIMARY KEY (id)
 );
 
@@ -71,6 +68,7 @@ CREATE TABLE step (
     map_glob VARCHAR(256) NOT NULL DEFAULT '*',
     map_regex VARCHAR(256) NOT NULL DEFAULT '',
     template TEXT NOT NULL DEFAULT '',
+    publish TINYINT NOT NULL DEFAULT 0,
     exec_context VARCHAR(256) NOT NULL DEFAULT 'local',
     exec_method VARCHAR(256) NOT NULL DEFAULT 'auto',
     exec_parameters TEXT NOT NULL DEFAULT '',
@@ -92,11 +90,10 @@ CREATE TABLE job (
     inputs TEXT NOT NULL DEFAULT '',
     parameters TEXT NOT NULL DEFAULT '',
     output_uri VARCHAR(256) NOT NULL DEFAULT '',
-    final_output TEXT NOT NULL DEFAULT '',
+    publish TEXT NOT NULL DEFAULT '',
     exec_context TEXT NOT NULL DEFAULT '',
     exec_method TEXT NOT NULL DEFAULT '',
     exec_parameters TEXT NOT NULL DEFAULT '',
-    notifications TEXT NOT NULL DEFAULT '[]',
     PRIMARY KEY (id)
 );
 

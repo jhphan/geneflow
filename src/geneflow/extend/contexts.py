@@ -13,11 +13,6 @@ class Contexts:
             'data': True,
             'data_scheme': 'local'
         },
-        'agave': {
-            'exec': True,
-            'data': True,
-            'data_scheme': 'agave'
-        },
         'gridengine': {
             'exec': True,
             'data': False,
@@ -27,9 +22,6 @@ class Contexts:
             'exec': True,
             'data': False,
             'data_scheme': 'local'
-        },
-        'tapis': {
-            'alias': 'agave'
         }
     }
 
