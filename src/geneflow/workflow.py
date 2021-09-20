@@ -366,15 +366,6 @@ class Workflow:
                 if step_name not in self._workflow['publish']:
                     self._workflow['publish'].append(step_name)
 
-        #for step_name in self._workflow['publish']:
-        #    Log.some().info('publish %s', step_name)
-        #    if step_name not in self._workflow['steps']:
-        #        Log.a().warning('invalid step name in publish list: %s', step_name)
-        #    else:
-        #        self._workflow['steps'][step_name]['publish'] = True
-        import pprint
-        pprint.pprint(self._workflow['publish'])
-
         # insert step execution parameters
         for step_name, step in self._workflow['steps'].items():
             step['execution'] = {
