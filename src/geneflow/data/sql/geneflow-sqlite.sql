@@ -42,6 +42,7 @@ CREATE TABLE app (
     implementation TEXT NOT NULL DEFAULT '',
     inputs TEXT NOT NULL DEFAULT '',
     parameters TEXT NOT NULL DEFAULT '',
+    images TEXT NOT NULL DEFAULT '',
     exec_pre TEXT NOT NULL DEFAULT '',
     exec_methods TEXT NOT NULL DEFAULT '',
     exec_post TEXT NOT NULL DEFAULT '',

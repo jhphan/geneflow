@@ -36,13 +36,13 @@ WORKFLOW_SCHEMA = {
                     'default': {
                         'anyof': [
                             {'type': 'string'},
-                            {'type': 'list', 'valueschema': {'type': 'string'}}
+                            {'type': 'list', 'schema': {'type': 'string'}}
                         ]
                     },
                     'value': {
                         'anyof': [
                             {'type': 'string'},
-                            {'type': 'list', 'valueschema': {'type': 'string'}}
+                            {'type': 'list', 'schema': {'type': 'string'}}
                         ]
                     }
                 }
@@ -212,8 +212,21 @@ APP_SCHEMA = {
                     'test_value': {'type': 'string', 'default': ''},
                     'post': {
                         'type': 'list',
-                        'schema': {'type': 'dict'},
-                        'nullable': True
+                        'default': [],
+                        'schema': {
+                            'type': 'dict',
+                            'schema': {
+                                'type': {
+                                    'type': 'string',
+                                    'allowed': ['docker','singularity','shell'],
+                                    'default': 'shell'
+                                },
+                                'image': {'type': 'string', 'coerce': str, 'regex': '[a-zA-Z0-9_]+'},
+                                'if': {'type': 'list', 'default': []},
+                                'else': {'type': 'list', 'default': []},
+                                'run': {'type': 'string', 'coerce': str}
+                            }
+                        }
                     }
                 }
             }
@@ -244,15 +257,79 @@ APP_SCHEMA = {
             'keysrules': {'type': 'string', 'regex': '[a-zA-Z0-9_]+'},
             'default': {},
             'valueschema': {
-                'type': 'string', 'default': '', 'coerce': str
+                'type': 'string',
+                'default': '',
+                'coerce': str
             }
         },
         'execution': {
             'type': 'dict',
             'schema': {
-                'pre': {'type': 'list', 'default': []},
-                'methods': {'type': 'list', 'default': []},
-                'post': {'type': 'list', 'default': []}
+                'pre': {
+                    'type': 'list',
+                    'default': [],
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'type': {
+                                'type': 'string',
+                                'allowed': ['docker','singularity','shell'],
+                                'default': 'shell'
+                            },
+                            'image': {'type': 'string', 'coerce': str, 'regex': '[a-zA-Z0-9_]+'},
+                            'if': {'type': 'list', 'default': []},
+                            'else': {'type': 'list', 'default': []},
+                            'run': {'type': 'string', 'coerce': str}
+                        }
+                    }
+                },
+                'methods': {
+                    'type': 'list',
+                    'default': [],
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'name': {'type': 'string', 'coerce': str},
+                            'if': {'type': 'list', 'default': []},
+                            'commands': {
+                                'type': 'list', 
+                                'default': [],
+                                'schema': {
+                                    'type': 'dict',
+                                    'schema': {
+                                        'type': {
+                                            'type': 'string',
+                                            'allowed': ['docker','singularity','shell'],
+                                            'default': 'shell'
+                                        },
+                                        'image': {'type': 'string', 'coerce': str, 'regex': '[a-zA-Z0-9_]+'},
+                                        'if': {'type': 'list', 'default': []},
+                                        'else': {'type': 'list', 'default': []},
+                                        'run': {'type': 'string', 'coerce': str}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                'post': {
+                    'type': 'list',
+                    'default': [],
+                    'schema': {
+                        'type': 'dict',
+                        'schema': {
+                            'type': {
+                                'type': 'string',
+                                'allowed': ['docker','singularity','shell'],
+                                'default': 'shell'
+                            },
+                            'image': {'type': 'string', 'coerce': str, 'regex': '[a-zA-Z0-9_]+'},
+                            'if': {'type': 'list', 'default': []},
+                            'else': {'type': 'list', 'default': []},
+                            'run': {'type': 'string', 'coerce': str}
+                        }
+                    }
+                }
             }
         },
         'implementation': {

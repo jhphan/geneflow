@@ -32,6 +32,7 @@ create table app (
     implementation text not null default '',
     inputs text not null default '',
     parameters text not null default '',
+    images text not null default '',
     exec_pre text not null default '',
     exec_methods text not null default '',
     exec_post text not null default '',

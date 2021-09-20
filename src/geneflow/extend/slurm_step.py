@@ -305,6 +305,14 @@ class SlurmStep(WorkflowStep):
                     param_key, parameters[param_key]
                 ))
 
+        # pass image parameters, if any
+        if 'images' in self._step['execution']['parameters']:
+            for image_key in self._step['execution']['parameters']['images']:
+                args.append('--image_{}={}'.format(
+                    image_key,
+                    self._step['execution']['parameters']['images'][image_key]
+                ))
+
         # add exeuction method
         args.append('--exec_method={}'.format(self._step['execution']['method']))
 

@@ -61,6 +61,7 @@ class AppEntity(Base):
     implementation = Column(Text, default='')
     inputs = Column(Text, default='')
     parameters = Column(Text, default='')
+    images = Column(Text, default='')
     exec_pre = Column(Text, default='')
     exec_methods = Column(Text, default='')
     exec_post = Column(Text, default='')
@@ -508,6 +509,7 @@ class DataSource:
                 AppEntity.author,
                 AppEntity.inputs,
                 AppEntity.parameters,
+                AppEntity.images,
                 AppEntity.implementation,
                 AppEntity.exec_pre,
                 AppEntity.exec_methods,
@@ -527,11 +529,12 @@ class DataSource:
                     'author': row[5],
                     'inputs': json.loads(row[6]),
                     'parameters': json.loads(row[7]),
-                    'implementation': json.loads(row[8]),
+                    'images': json.loads(row[8]),
+                    'implementation': json.loads(row[9]),
                     'execution': {
-                        'pre': json.loads(row[9]),
-                        'methods': json.loads(row[10]),
-                        'post': json.loads(row[11])
+                        'pre': json.loads(row[10]),
+                        'methods': json.loads(row[11]),
+                        'post': json.loads(row[12])
                     }
                 } for row in result
             }
@@ -838,6 +841,7 @@ class DataSource:
                 implementation=data['implementation'],
                 inputs=data['inputs'],
                 parameters=data['parameters'],
+                images=data['images'],
                 exec_pre=data['exec_pre'],
                 exec_methods=data['exec_methods'],
                 exec_post=data['exec_post']
@@ -1679,6 +1683,7 @@ class DataSource:
                 'implementation': json.dumps(valid_def['implementation']),
                 'inputs': json.dumps(valid_def['inputs']),
                 'parameters': json.dumps(valid_def['parameters']),
+                'images': json.dumps(valid_def['images']),
                 'exec_pre': json.dumps(valid_def['execution']['pre']),
                 'exec_methods': json.dumps(valid_def['execution']['methods']),
                 'exec_post': json.dumps(valid_def['execution']['post'])
@@ -1795,6 +1800,7 @@ class DataSource:
                     'implementation': json.dumps(valid_def['implementation']),
                     'inputs': json.dumps(valid_def['inputs']),
                     'parameters': json.dumps(valid_def['parameters']),
+                    'images': json.dumps(valid_def['images']),
                     'exec_pre': json.dumps(valid_def['execution']['pre']),
                     'exec_methods': json.dumps(valid_def['execution']['methods']),
                     'exec_post': json.dumps(valid_def['execution']['post'])

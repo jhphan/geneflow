@@ -262,6 +262,7 @@ class WorkflowInstaller:
                         Log.an().error('cannot write app yaml')
                         return False
 
+                Log.some().info('validation app')
                 if not app_installer.load_app():
                     Log.an().error('cannot load app config')
                     return False

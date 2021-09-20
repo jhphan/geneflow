@@ -279,7 +279,13 @@ class LocalStep(WorkflowStep):
                     param_key, parameters[param_key]
                 )
 
-        pprint.pprint(self._step['execution']['parameters'])
+        # pass image parameters, if any
+        if 'images' in self._step['execution']['parameters']:
+            for image_key in self._step['execution']['parameters']['images']:
+                cmd += ' --image_{}="{}"'.format(
+                    image_key,
+                    self._step['execution']['parameters']['images'][image_key]
+                )
 
         # add execution method
         cmd += ' --exec_method="{}"'.format(self._step['execution']['method'])
