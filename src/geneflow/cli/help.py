@@ -150,7 +150,7 @@ def help_func(args, other_args, subparser=None):
     print('\t\tor for specific steps with "step-name.slots:[VALUE]". Execution parameters')
     print('\t\tdepend on the execution context.')
     print()
-    print('Images: Container Images/Environments')
+    print('Customize Container Images/Environments w/ Execution Parameters:')
     for step_key in workflow_dict['steps']:
         for image_key in workflow_dict['apps'][workflow_dict['steps'][step_key]['app']]['images']:
             print(
