@@ -215,7 +215,7 @@ usage () {
     echo "  --{{ key }} => {{ value.description }}"
     {% endfor %}
     echo "  --exec_method => Execution method (
-        {%- for exec_method in exec_methods -%}
+        {%- for exec_method in execution.methods -%}
             {{- exec_method.name -}},{{- ' ' -}}
         {%- endfor %}auto)"
     echo "  --exec_init => Execution initialization command(s)"
@@ -529,7 +529,7 @@ fi
 ## ****************************************************************************
 ## List supported execution methods for this app (space delimited)
 exec_methods="
-    {%- for exec_method in exec_methods -%}
+    {%- for exec_method in execution.methods -%}
         {{- exec_method.name -}}{{ ' ' }}
     {%- endfor -%}auto"
 ## ****************************************************************************

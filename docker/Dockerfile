@@ -1,7 +1,7 @@
 
 # build singularity
 
-FROM golang:1.15.7-alpine3.12 as singularity_builder 
+FROM golang:1.17.3-alpine3.15 as singularity_builder 
 
 RUN apk update \
     && apk add --no-cache \
@@ -13,19 +13,19 @@ RUN apk update \
         util-linux-dev \
         libseccomp-dev \
         gawk \
-    && mkdir -p $GOPATH/src/github.com/sylabs \
-    && cd $GOPATH/src/github.com/sylabs \
-    && git clone -b v3.7.1 https://github.com/sylabs/singularity.git \
-    && cd $GOPATH/src/github.com/sylabs/singularity \
+    && mkdir -p $GOPATH/src/github.com/apptainer \
+    && cd $GOPATH/src/github.com/apptainer \
+    && git clone -b v3.8.5 https://github.com/apptainer/singularity.git \
+    && cd $GOPATH/src/github.com/apptainer/singularity \
     && ./mconfig -s -S -p /opt/singularity \
-    && cd $GOPATH/src/github.com/sylabs/singularity/builddir \
+    && cd $GOPATH/src/github.com/apptainer/singularity/builddir \
     && make \
     && make install
 
 
 # build final container
 
-FROM python:3.9.1-alpine3.12
+FROM python:3.10.0-alpine3.15
 
 COPY --from=singularity_builder /opt/singularity /opt/singularity
 

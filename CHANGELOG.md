@@ -1,5 +1,11 @@
 # Changelog
 
+## 2021/12/03 - v3.0.0-alpha.2: bug fix release
+
+1. Fix wrapper script to handle execution methods correctly.
+
+2. Update Dockerfile container versions.
+
 
 ## 2021/09/20 - v3.0.0-alpha.1: major enhancement/simplification release
 
