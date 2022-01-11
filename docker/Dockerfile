@@ -34,7 +34,7 @@ COPY . /src/geneflow
 
 RUN apk update \
     && apk add --no-cache --virtual .build-deps build-base libffi-dev openssl-dev \
-    && apk add --no-cache git squashfs-tools libseccomp sudo coreutils \
+    && apk add --no-cache git squashfs-tools libseccomp sudo coreutils bash \
     && pip install -U pip \
     && pip install ./geneflow \
     && rm -rf /src/* \
